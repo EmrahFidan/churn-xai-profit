@@ -7,3 +7,4 @@ __pycache__/
 data/raw/*.csv
 outputs/
 Makale-DATA/
+data/holdout/*.csv
