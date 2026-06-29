@@ -1,0 +1,30 @@
+random_seed: 42
+
+# Each dataset is processed independently in its own lane.
+# Datasets are NEVER merged; outputs are kept separate per dataset.
+datasets:
+  telco:
+    name: Telco Customer Churn
+    file: telco.csv
+    sector: telecom
+    target: Churn
+  cell2cell:
+    name: Cell2Cell
+    file: cell2cell.csv
+    sector: telecom
+    target: Churn
+  ecommerce:
+    name: E-commerce Churn
+    file: ecommerce.csv
+    sector: ecommerce
+    target: Churn
+  iranian:
+    name: Iranian Churn
+    file: iranian.csv
+    sector: telecom
+    target: Churn
+  bank:
+    name: Bank Customer Churn
+    file: bank.csv
+    sector: banking
+    target: Exited
