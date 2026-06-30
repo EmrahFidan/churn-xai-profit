@@ -331,9 +331,19 @@ KOLON6 = {
     "kavram": "Kavram",
     "kaynak_feature": "Kaynak feature",
     "hedef_feature": "Hedef feature",
+    "esleme_tipi": "Eşleme tipi",
+    "c2c_kolon": "Cell2Cell kolon",
+    "iran_kolon": "Iranian kolon",
+    "gerekce": "Seçim gerekçesi",
 }
+ESLEME_TIPI = {"onem": "önem-temelli", "semantik": "semantik"}
+FIG6_DOSYA["semantic"] = "transfer_semantic_vs_importance.png"
+FIG6_BASLIK["semantic"] = "Transfer — semantik vs önem-temelli eşleme (koruma oranı)"
 MSG6 = {
     "senaryo": "{ad} ({yon}): ortak kavram={k} | transfer PR-AUC={tr:.3f} | ref={ref:.3f} "
                "| trivial={tv:.3f} | oran={oran:.2f} -> {karar}",
+    "semantik": "{ad} [semantik]: kavram={k} | transfer PR-AUC={tr:.3f} | ref={ref:.3f} "
+                "| trivial={tv:.3f} | oran={oran:.2f} -> {karar}",
+    "atlanan": "  semantik eşlemede atlanan kavram(lar): {liste}",
     "bitti": "ADIM 6 (transfer) tamamlandı. Yorum/karar kullanıcıya bırakıldı. Sağlamlık/yazım (Adım 7) yapılmadı.",
 }

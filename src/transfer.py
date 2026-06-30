@@ -98,10 +98,26 @@ def tam_ref(hedef_set):
     return np.nan
 
 
-def calistir_senaryo(anahtar, ad, kaynak_set, hedef_set, tip, veriler, seed):
-    ksrc, ktgt = veriler[kaynak_set], veriler[hedef_set]
-    ortak, esleme = ortak_kavramlar(kaynak_set, ksrc, hedef_set, ktgt)
+# semantik (elle sabit) temsilciler — önem'e göre seçilmez; aynı operasyonel olgu
+SEMANTIK = [
+    ("Kullanım hacmi (süre)", "MonthlyMinutes", "Seconds of Use", "dakika/süre temelli kullanım hacmi"),
+    ("Kullanım sıklığı (arama adedi)", "PeakCallsInOut", "Frequency of use",
+     "zirve gelen/giden arama adedi: kullanım sıklığının tekil ölçütü (dakika ayrı kavram)"),
+    ("Şikâyet/destek", "CustomerCareCalls", "Complains", "müşteri hizmetleri teması ~ şikâyet sinyali"),
+    ("İlişki süresi", "MonthsInService", "Subscription  Length", "abonelik/hizmet süresi"),
+    ("Parasal değer", "MonthlyRevenue", "Customer Value", "müşterinin parasal değeri"),
+]
 
+
+def _karar(transfer, ref, trivial, oran):
+    if transfer < trivial * TRIVIAL_KAT:
+        return "zayif"
+    return "dahil" if oran >= ESIK_DAHIL else "kismi"
+
+
+def _degerlendir(anahtar, ad, kaynak_set, hedef_set, tip, esleme, esleme_tipi, veriler, seed):
+    """Verilen kavram->(kaynak_col, hedef_col) eşlemesiyle transferi ölçer."""
+    ksrc, ktgt = veriler[kaynak_set], veriler[hedef_set]
     Xk = _matris(ksrc, esleme, "kaynak")
     yk = ksrc["churn"].to_numpy()
     Xh = _matris(ktgt, esleme, "hedef")
@@ -117,24 +133,35 @@ def calistir_senaryo(anahtar, ad, kaynak_set, hedef_set, tip, veriler, seed):
     trivial = float(yh.mean())
     oran = transfer / ref if ref > 0 else 0.0
     pred = (p >= 0.5).astype(int)
-
-    if transfer < trivial * TRIVIAL_KAT:
-        karar = "zayif"
-    elif oran >= ESIK_DAHIL:
-        karar = "dahil"
-    else:
-        karar = "kismi"
-
     return {
-        "anahtar": anahtar, "ad": ad, "tip": tip,
-        "ortak": ortak, "esleme": esleme,
+        "anahtar": anahtar, "ad": ad, "tip": tip, "esleme_tipi": esleme_tipi,
+        "ortak": list(esleme.keys()), "esleme": esleme,
         "transfer": transfer, "ref": ref, "tam_ref": tam_ref(hedef_set),
         "trivial": trivial, "oran": oran,
         "recall": float(recall_score(yh, pred, zero_division=0)),
         "precision": float(precision_score(yh, pred, zero_division=0)),
         "f1": float(f1_score(yh, pred, zero_division=0)),
-        "karar": karar,
+        "karar": _karar(transfer, ref, trivial, oran),
     }
+
+
+def calistir_senaryo(anahtar, ad, kaynak_set, hedef_set, tip, veriler, seed):
+    """Önem-temelli temsilcilerle transfer (otomatik ortak-kavram eşlemesi)."""
+    _, esleme = ortak_kavramlar(kaynak_set, veriler[kaynak_set], hedef_set, veriler[hedef_set])
+    return _degerlendir(anahtar, ad, kaynak_set, hedef_set, tip, esleme, "onem", veriler, seed)
+
+
+def calistir_semantik(anahtar, ad, kaynak_set, hedef_set, veriler, seed):
+    """Semantik (elle sabit) temsilcilerle transfer — yalnız telekom-içi çift."""
+    esleme, atlanan = {}, []
+    for label, c2c, iran, _ in SEMANTIK:
+        if c2c not in veriler["cell2cell"].columns or iran not in veriler["iranian"].columns:
+            atlanan.append(label)
+            continue
+        esleme[label] = (c2c, iran) if kaynak_set == "cell2cell" else (iran, c2c)
+    r = _degerlendir(anahtar, ad, kaynak_set, hedef_set, "sektör-içi", esleme, "semantik", veriler, seed)
+    r["atlanan"] = atlanan
+    return r
 
 
 # ----------------------------- tablolar -----------------------------
@@ -144,6 +171,7 @@ def tablo_sonuc(sonuclar):
     for r in sonuclar:
         rows.append({
             K["senaryo"]: r["anahtar"], K["yon"]: r["ad"],
+            K["esleme_tipi"]: S.ESLEME_TIPI[r.get("esleme_tipi", "onem")],
             K["ortak_kavram"]: len(r["ortak"]),
             K["transfer"]: round(r["transfer"], 4), K["ref"]: round(r["ref"], 4),
             K["tam_ref"]: round(r["tam_ref"], 4), K["trivial"]: round(r["trivial"], 4),
@@ -166,6 +194,16 @@ def tablo_feature_map(sonuclar):
                          K["kaynak_feature"]: ks, K["hedef_feature"]: ht})
     df = pd.DataFrame(rows)
     df.to_csv(cfg.TABLES / "transfer_feature_map.csv", index=False)
+    return df
+
+
+def tablo_feature_map_semantic():
+    """Semantik (elle sabit) eşleme + seçim gerekçeleri."""
+    K = S.KOLON6
+    rows = [{K["kavram"]: label, K["c2c_kolon"]: c2c, K["iran_kolon"]: iran, K["gerekce"]: ger}
+            for label, c2c, iran, ger in SEMANTIK]
+    df = pd.DataFrame(rows)
+    df.to_csv(cfg.TABLES / "transfer_feature_map_semantic.csv", index=False)
     return df
 
 
@@ -216,3 +254,30 @@ def figur_retention(sonuclar):
     ax.legend(fontsize=9)
     fig.tight_layout()
     return _kaydet(fig, S.FIG6_DOSYA["retention"])
+
+
+def figur_semantic_vs_importance(onem_sonuclar, semantik_sonuclar):
+    """A1/A2: semantik vs önem-temelli koruma oranı (baraj bandı + trivial/ref işareti)."""
+    from . import plotstyle as ps
+    anahtarlar = [r["anahtar"] for r in semantik_sonuclar]
+    onem = {r["anahtar"]: r for r in onem_sonuclar}
+    x = np.arange(len(anahtarlar))
+    w = 0.36
+    fig, ax = plt.subplots(figsize=(7.5, 5))
+    o_oran = [onem[a]["oran"] for a in anahtarlar]
+    s_oran = [r["oran"] for r in semantik_sonuclar]
+    ax.bar(x - w / 2, o_oran, w, label="Önem-temelli eşleme", color="#7F7F7F")
+    ax.bar(x + w / 2, s_oran, w, label="Semantik eşleme", color=ps.CHURN_RENK[1])
+    ax.axhspan(0.70, 0.80, color="green", alpha=0.12, label="Baraj bandı (%70–80)")
+    for i, r in enumerate(semantik_sonuclar):
+        tr_oran = r["trivial"] / r["ref"] if r["ref"] > 0 else 0.0
+        ax.plot([i - 0.7 * w, i + 0.7 * w], [tr_oran, tr_oran], color="black",
+                linestyle=":", linewidth=1.3)
+    ax.plot([], [], color="black", linestyle=":", label="Trivial / referans")
+    ax.set_xticks(x)
+    ax.set_xticklabels([f"{a}\n{onem[a]['ad']}" for a in anahtarlar], fontsize=8)
+    ax.set_ylabel(S.EKSEN6["oran"])
+    ax.set_title(S.FIG6_BASLIK["semantic"])
+    ax.legend(fontsize=9)
+    fig.tight_layout()
+    return _kaydet(fig, S.FIG6_DOSYA["semantic"])
