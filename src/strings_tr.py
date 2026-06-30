@@ -202,3 +202,46 @@ MSG3 = {
                   "değerler üretir (sentetik örnekler 0/1 dışına çıkar) — Methods/limitations'a yazılacak.",
     "bitti": "ADIM 3 (RQ1) tamamlandı. Yöntem seçimi/yorum kullanıcıya bırakıldı. SHAP/RQ2 yapılmadı.",
 }
+
+# ===================== ADIM 4: SHAP / RQ2 =====================
+FIG4_DOSYA = {
+    "beeswarm": "shap_beeswarm.png",
+    "importance": "shap_importance_bar.png",
+    "dependence": "shap_dependence_topK.png",
+    "waterfall_high": "shap_waterfall_high.png",
+    "waterfall_low": "shap_waterfall_low.png",
+    "consistency": "rq2_driver_consistency_heatmap.png",
+}
+FIG4_BASLIK = {
+    "beeswarm": "SHAP özet (beeswarm, ilk 15) — {set}",
+    "importance": "Global önem (ortalama |SHAP|, kavram-toplamı) — {set}",
+    "dependence": "SHAP bağımlılık (en güçlü değişkenler) — {set}",
+    "waterfall_high": "Tekil açıklama — yüksek riskli müşteri — {set}",
+    "waterfall_low": "Tekil açıklama — düşük riskli müşteri — {set}",
+    "consistency": "RQ2 — Setler-arası kavramsal sürücü tutarlılığı",
+}
+EKSEN4 = {
+    "shap_deger": "SHAP değeri (churn olasılığına etki)",
+    "ortalama_etki": "Ortalama |SHAP| (churn'e katkı)",
+    "kavram": "Kavram",
+}
+KOLON4 = {
+    "feature": "Özellik",
+    "mean_abs_shap": "Ortalama |SHAP|",
+    "sira": "Sıra",
+    "kavram": "Kavram",
+    "veri_seti": "Veri Seti",
+    "durum": "Durum",
+    "olasilik": "Churn olasılığı",
+    "ham_deger": "Ham değer",
+    "shap_katki": "SHAP katkısı",
+    "top3_say": "Top-3 sektör sayısı",
+}
+DURUM = {"high": "yüksek riskli", "low": "düşük riskli"}
+MSG4 = {
+    "set": "{set}: SHAP hesaplandı (örneklem n={n}); top sürücü: {top}",
+    "ornek_not": "{set}: SHAP açıklaması için stratified örneklem n={n} (tam veri {N}).",
+    "eslenemeyen": "{set}: kavram haritasında olmayan (->'diger') feature'lar: {liste}",
+    "iranian_status": "iranian SHAP: 'Status' global önem sırası={sira}/{toplam}, pay=%{pay:.1f} — {yorum}",
+    "bitti": "ADIM 4 (RQ2) tamamlandı. Yorum/karar kullanıcıya bırakıldı. Kâr/ROI (RQ3) yapılmadı.",
+}
