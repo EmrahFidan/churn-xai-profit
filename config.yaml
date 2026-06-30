@@ -28,3 +28,13 @@ datasets:
     file: bank.csv
     sector: banking
     target: Exited
+
+# Adim 5 — maliyete duyarli esik / kar / ROI / EMP parametreleri (sihirli sayi yok;
+# tum sonuclar parametre araligi uzerinden raporlanir).
+profit:
+  ufuk_ay: 24                 # CLV ufku (ay)
+  banka_marj_yillik: 0.02     # bank: Balance uzerinden yillik marj proxy
+  c_oranlari: [0.01, 0.02, 0.05, 0.10, 0.20]   # mudahale maliyeti = ortalama_CLV * oran
+  gamma_listesi: [0.2, 0.3, 0.4, 0.5]          # elde-tutma basari olasiligi
+  emp_c_oran: 0.05            # EMP icin referans maliyet orani (ort_CLV'nin yuzdesi)
+  emp_beta: [6, 14]           # EMP: gamma ~ Beta(alpha, beta) (Verbraken varsayilani, E=0.3)

@@ -245,3 +245,57 @@ MSG4 = {
     "iranian_status": "iranian SHAP: 'Status' global önem sırası={sira}/{toplam}, pay=%{pay:.1f} — {yorum}",
     "bitti": "ADIM 4 (RQ2) tamamlandı. Yorum/karar kullanıcıya bırakıldı. Kâr/ROI (RQ3) yapılmadı.",
 }
+
+# ===================== ADIM 5: kâr / ROI / EMP (RQ3) =====================
+STRATEJI_AD = {
+    "A": "Doğruluk-eşiği (t=0.5)",
+    "B": "Kâr-maksimize eşik (t*)",
+    "hepsi": "Herkese müdahale",
+    "hic": "Müdahale yok",
+}
+FIG5_DOSYA = {
+    "profit_threshold": "rq3_profit_vs_threshold.png",
+    "roi_sensitivity": "rq3_roi_sensitivity.png",
+    "strategy": "rq3_strategy_comparison.png",
+    "emp": "rq3_emp_by_dataset.png",
+}
+FIG5_BASLIK = {
+    "profit_threshold": "RQ3 — Kâr vs eşik (c=%{c}, γ={g}) — {set}",
+    "roi_sensitivity": "RQ3 — ROI duyarlılığı (maliyet × γ), kâr-eşiğinde — {set}",
+    "strategy": "RQ3 — Strateji kıyası (c=%{c}, γ={g}) — {set}",
+    "emp": "RQ3 — Setler-arası EMP (müşteri başına beklenen maksimum kâr)",
+}
+EKSEN5 = {
+    "esik": "Karar eşiği (t)",
+    "kar": "Toplam kâr (CLV birimi)",
+    "kar_kisi": "Müşteri başına kâr (CLV birimi)",
+    "maliyet_oran": "Müdahale maliyeti (ort. CLV oranı)",
+    "gamma": "γ (elde-tutma başarısı)",
+    "roi": "ROI (kâr / müdahale maliyeti)",
+}
+KOLON5 = {
+    "veri_seti": "Veri Seti",
+    "c": "Maliyet (c)",
+    "c_oran": "Maliyet oranı",
+    "gamma": "γ",
+    "esik_a": "Eşik A (0.5)",
+    "esik_b": "Eşik B (t*)",
+    "kar_a": "Kâr A",
+    "kar_b": "Kâr B",
+    "roi_a": "ROI A",
+    "roi_b": "ROI B",
+    "roi_artis": "ROI artışı (B−A)",
+    "kar_artis_yuzde": "Kâr artışı %",
+    "emp": "EMP (kişi başı)",
+    "clv_temeli": "CLV temeli",
+    "ort_clv": "Ortalama CLV",
+    "medyan_clv": "Medyan CLV",
+    "sifir_clv": "Sıfır CLV sayısı",
+}
+MSG5 = {
+    "clv": "{set}: CLV temeli = {temel}; ort={ort:.1f} medyan={medyan:.1f} (sıfır CLV: {sifir})",
+    "emp_varsayim": "EMP varsayımı: γ ~ Beta({a},{b}) (E[γ]={e:.2f}), referans maliyet=ort_CLV'nin %{c}'si.",
+    "set_ozet": "{set}: kâr-eşiği ROI artışı aralığı (c,γ taraması): {dusuk} … {yuksek}; EMP={emp:.4f}",
+    "emp_sira": "EMP sıralaması (yüksek->düşük): {sira}",
+    "bitti": "ADIM 5 (RQ3) tamamlandı. Yorum/karar kullanıcıya bırakıldı. Transfer (Adım 6) yapılmadı.",
+}
