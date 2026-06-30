@@ -162,3 +162,43 @@ MSG2 = {
     "iranian_status": "iranian: 'Status' çıkarılınca PR-AUC {oncesi} -> {sonrasi} (fark {fark:+.4f}) [{model}]",
     "bitti": "ADIM 2 tamamlandı. Model ailesi ve kalibrasyon seçimi kullanıcıya bırakıldı. Dengeleme (RQ1) yapılmadı.",
 }
+
+# ===================== ADIM 3: RQ1 dengeleme =====================
+KOSUL_AD = {
+    "baseline": "Baseline (doğal)",
+    "class_weight": "Class-weight",
+    "smote": "SMOTENC/SMOTE",
+    "adasyn": "ADASYN",
+    "threshold": "Eşik kaydırma (max-F1)",
+}
+FIG3_DOSYA = {
+    "prauc": "rq1_prauc_by_method.png",
+    "recall_precision": "rq1_recall_precision.png",
+    "calibration": "rq1_calibration_by_method.png",
+    "pr_operating": "rq1_pr_curve_operating.png",
+}
+FIG3_BASLIK = {
+    "prauc": "RQ1 — Yönteme göre PR-AUC — {set}",
+    "recall_precision": "RQ1 — Duyarlılık/Kesinlik dengesi (işletim noktası) — {set}",
+    "calibration": "RQ1 — Yönteme göre kalibrasyon (ECE) — {set}",
+    "pr_operating": "RQ1 — PR eğrisi + işletim noktaları — {set}",
+}
+KOLON3 = {
+    "veri_seti": "Veri Seti",
+    "yontem": "Yöntem",
+    "pr_auc": "PR-AUC",
+    "roc_auc": "ROC-AUC",
+    "recall": "Duyarlılık",
+    "precision": "Kesinlik",
+    "f1": "F1",
+    "ece": "ECE",
+    "brier": "Brier",
+    "esik": "Eşik",
+}
+MSG3 = {
+    "set_basla": "{set}: RQ1 dengeleme karşılaştırması (LightGBM sabit, {n} koşul)",
+    "kosul": "  {set} / {yontem}: PR-AUC={pr} recall={rec} precision={pre} ECE={ece} eşik={esik}",
+    "adasyn_not": "NOT: ADASYN encode edilmiş matriste çalışır; one-hot kategorik kolonlar için kesirli "
+                  "değerler üretir (sentetik örnekler 0/1 dışına çıkar) — Methods/limitations'a yazılacak.",
+    "bitti": "ADIM 3 (RQ1) tamamlandı. Yöntem seçimi/yorum kullanıcıya bırakıldı. SHAP/RQ2 yapılmadı.",
+}

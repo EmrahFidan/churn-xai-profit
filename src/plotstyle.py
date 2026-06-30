@@ -28,6 +28,15 @@ YONTEM_STIL = {
     "Isotonic": {"linestyle": "-", "color": "#C44E52"},
 }
 
+# RQ1 dengeleme koşulları için sabit renkler
+KOSUL_RENK = {
+    "baseline": "#7F7F7F",
+    "class_weight": "#4C72B0",
+    "smote": "#55A868",
+    "adasyn": "#C44E52",
+    "threshold": "#8172B3",
+}
+
 
 def uygula():
     """Ortak temayı uygular (idempotent)."""

@@ -78,6 +78,32 @@ def on_isleyici(set_adi: str, df: pd.DataFrame, olcekle: bool):
     return Pipeline(steps), {"sayisal": num, "nominal": nom, "ozel": ozel}
 
 
+def parcalar(set_adi: str, df: pd.DataFrame, olcekle: bool = False):
+    """Önişlem parçalarını AYRI döndürür (resampler'ı prep ile encode arasına koymak için).
+
+    Dönüş: {prep, ct, sayisal, nominal, kolonlar, kat_idx}. `prep` cell2cell için
+    HamHazirla, diğerlerinde None. `kat_idx` resampler (SMOTENC) için kategorik kolon
+    indeksleri (önişlem sonrası kolon sırasına göre). `ct` yalnız encode (prep hariç).
+    """
+    feats = df.drop(columns=["churn"])
+    ozel = set_adi == "cell2cell"
+    prep = HamHazirla() if ozel else None
+    ornek = HamHazirla().fit_transform(feats) if ozel else feats
+    num = [c for c in ornek.columns if is_numeric_dtype(ornek[c])]
+    nom = [c for c in ornek.columns if not is_numeric_dtype(ornek[c])]
+
+    num_tf = StandardScaler() if olcekle else "passthrough"
+    transformers = [("num", num_tf, num)]
+    if nom:
+        transformers.append(("nom", OneHotEncoder(handle_unknown="ignore", sparse_output=False), nom))
+    ct = ColumnTransformer(transformers, remainder="drop")
+
+    kolonlar = list(ornek.columns)
+    kat_idx = [kolonlar.index(c) for c in nom]
+    return {"prep": prep, "ct": ct, "sayisal": num, "nominal": nom,
+            "kolonlar": kolonlar, "kat_idx": kat_idx}
+
+
 def sema_yaz(set_adi: str, sema: dict):
     """encoding_schema_<set>.csv yazar (kolon, rol, not). Dönüş: yol."""
     cfg.klasorleri_hazirla()
