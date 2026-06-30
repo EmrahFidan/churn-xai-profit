@@ -1,8 +1,44 @@
-"""Configuration loading.
+"""Yapılandırma ve yol sabitleri.
 
-Reads config.yaml (random seed + per-dataset registry: file, sector, target)
-and exposes it to the rest of the pipeline. Datasets are processed independently
-and never merged.
+config.yaml'ı (rastgele tohum + veri seti kaydı: dosya, sektör, hedef) okur ve
+tüm modüllere ortak yolları sağlar. Veri setleri bağımsız işlenir, asla
+birleştirilmez.
 """
+from pathlib import Path
+import yaml
 
-# TODO: load config.yaml, expose random_seed and the dataset registry
+# Depo kökü (bu dosya src/ altında)
+ROOT = Path(__file__).resolve().parents[1]
+RAW = ROOT / "data" / "raw"
+HOLDOUT = ROOT / "data" / "holdout"
+PROCESSED = ROOT / "data" / "processed"
+FIGURES = ROOT / "outputs" / "figures"
+TABLES = ROOT / "outputs" / "tables"
+LOGS = ROOT / "outputs" / "logs"
+
+
+def yukle():
+    """config.yaml içeriğini sözlük olarak döndürür."""
+    with open(ROOT / "config.yaml", encoding="utf-8") as f:
+        return yaml.safe_load(f)
+
+
+CFG = yukle()
+SEED = CFG["random_seed"]
+DATASETS = CFG["datasets"]  # key -> {name, file, sector, target}
+
+# Referans profiller (kör güvenmemek için doğrulama): satır, sütun(ham), churn%
+REFERANS = {
+    "telco": (7043, 21, 26.5),
+    "cell2cell": (51047, 58, 28.8),
+    "ecommerce": (3941, 11, 17.1),
+    "iranian": (3150, 14, 15.7),
+    "bank": (10000, 14, 20.4),
+}
+HOLDOUT_DOSYA = "cell2cell_test.csv"  # etiketsiz, cell2cell ile aynı şema
+
+
+def klasorleri_hazirla():
+    """Çıktı klasörlerini oluşturur (idempotent)."""
+    for d in (PROCESSED, FIGURES, TABLES, LOGS):
+        d.mkdir(parents=True, exist_ok=True)
