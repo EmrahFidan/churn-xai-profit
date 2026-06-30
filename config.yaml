@@ -1,4 +1,6 @@
 random_seed: 42
+# Adim 7 — saglamlik icin tekrarli kosu tohumlari (ort ± std + %95 CI)
+seeds: [42, 7, 123, 2024, 99]
 
 # Each dataset is processed independently in its own lane.
 # Datasets are NEVER merged; outputs are kept separate per dataset.

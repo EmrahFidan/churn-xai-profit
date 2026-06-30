@@ -347,3 +347,57 @@ MSG6 = {
     "atlanan": "  semantik eşlemede atlanan kavram(lar): {liste}",
     "bitti": "ADIM 6 (transfer) tamamlandı. Yorum/karar kullanıcıya bırakıldı. Sağlamlık/yazım (Adım 7) yapılmadı.",
 }
+
+# ===================== ADIM 7: sağlamlık (ablation + CI + anlamlılık) =====================
+KOSUL_ABLATION = {
+    "K0": "K0 Tam sistem (ham + kâr-eşiği)",
+    "K1": "K1 −kâr-eşiği (accuracy 0.5)",
+    "K2": "K2 −kalibrasyon (class-weight)",
+    "K3": "K3 −güçlü model (LogReg)",
+    "K4": "K4 +imbalance (SMOTE)",
+}
+FIG7_DOSYA = {
+    "ablation": "ablation_profit_waterfall.png",
+    "ci": "robustness_ci_forest.png",
+    "significance": "significance_heatmap.png",
+}
+FIG7_BASLIK = {
+    "ablation": "Kâr-zinciri ablation — bileşen çıkınca kâr kaybı (5 seed ort. ± %95 CI)",
+    "ci": "Tekrarlı koşu — PR-AUC nokta + %95 CI (5 seed)",
+    "significance": "Anlamlılık — model çiftleri Wilcoxon p-değeri",
+}
+EKSEN7 = {
+    "kar": "Toplam kâr (CLV birimi)",
+    "prauc": "PR-AUC",
+    "set": "Veri seti",
+}
+KOLON7 = {
+    "veri_seti": "Veri Seti",
+    "kosul": "Koşul",
+    "kar_ort": "Kâr (ort)",
+    "kar_ci_low": "Kâr CI alt",
+    "kar_ci_high": "Kâr CI üst",
+    "roi": "ROI",
+    "ece": "ECE",
+    "esik": "Eşik t*",
+    "dkar": "Δkâr (vs K0)",
+    "dkar_yuzde": "Δkâr %",
+    "metrik": "Metrik",
+    "ort": "Ortalama",
+    "std": "Std",
+    "ci_low": "CI alt (%95)",
+    "ci_high": "CI üst (%95)",
+    "kiyas": "Kıyas",
+    "test": "Test",
+    "istatistik": "İstatistik",
+    "p": "p-değeri",
+    "sonuc": "Sonuç",
+}
+ANLAMLI = {True: "anlamlı (p<0.05)", False: "gürültü (p≥0.05)"}
+MSG7 = {
+    "ablation": "{set} / {kosul}: kâr={kar:.0f} ROI={roi:.2f} ECE={ece:.3f} t*={esik:.2f} | Δvs K0={dkar:+.0f} ({yuzde:+.1f}%)",
+    "ci": "{set} {metrik}: {ort:.4f} ± {std:.4f}  [%95 CI {lo:.4f}, {hi:.4f}]",
+    "sig": "{kiyas}: {test} istatistik={ist:.1f} p={p:.4f} -> {sonuc}",
+    "yontem": "Anlamlılık yöntemi: eşli skorlar (set×seed OOF PR-AUC, n={n}) üstünde Wilcoxon signed-rank.",
+    "bitti": "ADIM 7 (sağlamlık) tamamlandı. Deney fazı bitti; yorum/karar kullanıcıya bırakıldı, sırada yazım.",
+}
