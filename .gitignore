@@ -9,3 +9,4 @@ outputs/
 Makale-DATA/
 data/holdout/*.csv
 data/processed/*.csv
+*.zip

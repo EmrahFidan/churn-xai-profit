@@ -96,3 +96,69 @@ MSG = {
     "bolum": "===== {ad} =====",
     "bitti": "ADIM 1 tamamlandı. Düşürme kararı kullanıcıya bırakıldı (leakage). Modellemeye geçilmedi.",
 }
+
+# ===================== ADIM 2: modelleme + kalibrasyon =====================
+MODEL_AD = {
+    "logreg": "Logistic Regression",
+    "rf": "Random Forest",
+    "xgboost": "XGBoost",
+    "lightgbm": "LightGBM",
+}
+YONTEM_AD = {
+    "ham": "Ham (kalibre değil)",
+    "Platt": "Platt (sigmoid)",
+    "Isotonic": "Isotonic",
+}
+
+FIG2_DOSYA = {
+    "calibration": "calibration_curves.png",
+    "pr": "pr_curve.png",
+    "roc": "roc_curve.png",
+    "model_comparison": "model_comparison.png",
+}
+FIG2_BASLIK = {
+    "calibration": "Kalibrasyon eğrileri ({model}) — {set}",
+    "pr": "Precision-Recall eğrileri — {set}",
+    "roc": "ROC eğrileri — {set}",
+    "model_comparison": "Model karşılaştırması (PR-AUC / Duyarlılık / F1) — {set}",
+}
+EKSEN2 = {
+    "recall": "Duyarlılık (recall)",
+    "precision": "Kesinlik (precision)",
+    "fpr": "Yanlış pozitif oranı",
+    "tpr": "Doğru pozitif oranı (recall)",
+    "tahmin_olasilik": "Tahmin edilen olasılık (kova ortalaması)",
+    "gercek_oran": "Gerçek pozitif oranı",
+    "metrik_deger": "Değer",
+}
+# tablo kolon başlıkları (Adım 2)
+KOLON2 = {
+    "veri_seti": "Veri Seti",
+    "model": "Model",
+    "pr_auc": "PR-AUC",
+    "roc_auc": "ROC-AUC",
+    "recall": "Duyarlılık",
+    "precision": "Kesinlik",
+    "f1": "F1",
+    "yontem": "Yöntem",
+    "brier": "Brier",
+    "ece": "ECE",
+    "kolon": "Kolon",
+    "rol": "Rol",
+    "not": "Not",
+}
+ROL = {
+    "sayisal": "sayısal",
+    "nominal": "nominal (one-hot)",
+    "ozel_hp": "özel: string -> sayısal, eksik/Unknown -> train medyanı",
+    "ozel_hp_bayrak": "özel: HandsetPrice 'Unknown'/parse edilemez bayrağı (0/1)",
+    "ozel_sa": "özel: en sık 15 kategori + 'Other' -> one-hot",
+}
+MSG2 = {
+    "hpo": "{set} / {model}: HPO bitti (en iyi PR-AUC={skor:.4f})",
+    "deg": "{set} / {model}: 5-kat değerlendirme + kalibrasyon bitti",
+    "kazanan": "{set}: en iyi model {model} (PR-AUC={skor})",
+    "kalib_kazanan": "{set} / {model}: kalibrasyon kazananı {yontem} (ECE={ece})",
+    "iranian_status": "iranian: 'Status' çıkarılınca PR-AUC {oncesi} -> {sonrasi} (fark {fark:+.4f}) [{model}]",
+    "bitti": "ADIM 2 tamamlandı. Model ailesi ve kalibrasyon seçimi kullanıcıya bırakıldı. Dengeleme (RQ1) yapılmadı.",
+}

@@ -14,6 +14,20 @@ from . import strings_tr as S
 CHURN_RENK = {0: "#4C72B0", 1: "#C44E52"}
 PALET = [CHURN_RENK[0], CHURN_RENK[1]]
 
+# modeller için sabit renkler (eğri/bar figürleri)
+MODEL_RENK = {
+    "logreg": "#4C72B0",
+    "rf": "#55A868",
+    "xgboost": "#C44E52",
+    "lightgbm": "#8172B3",
+}
+# kalibrasyon yöntemleri için sabit çizgi stilleri
+YONTEM_STIL = {
+    "ham": {"linestyle": ":", "color": "#7F7F7F"},
+    "Platt": {"linestyle": "--", "color": "#4C72B0"},
+    "Isotonic": {"linestyle": "-", "color": "#C44E52"},
+}
+
 
 def uygula():
     """Ortak temayı uygular (idempotent)."""
