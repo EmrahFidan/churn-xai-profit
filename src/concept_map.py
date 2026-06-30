@@ -13,9 +13,12 @@ KAVRAM_AD = {
     "kullanim": "Kullanım hacmi",
     "dusus": "Kullanım düşüşü",
     "destek": "Şikâyet / destek / hizmet kalitesi",
+    "etkilesim": "Etkileşim / recency",
     "parasal": "Parasal değer / harcama",
+    "kredi": "Kredi / risk",
     "odeme": "Ödeme / fatura tipi",
     "hizmet": "Hizmet / abonelik kapsamı",
+    "cihaz": "Cihaz / ekipman",
     "demografi": "Demografi",
     "diger": "Diğer",
 }
@@ -33,12 +36,12 @@ HARITA = {
     # --- bank ---
     "Tenure": "tenure", "Balance": "parasal", "EstimatedSalary": "parasal",
     "NumOfProducts": "hizmet", "HasCrCard": "odeme", "IsActiveMember": "kullanim",
-    "Geography": "demografi", "Gender": "demografi", "Age": "demografi", "CreditScore": "diger",
+    "Geography": "demografi", "Gender": "demografi", "Age": "demografi", "CreditScore": "kredi",
     # --- ecommerce ---
-    "NumberOfDeviceRegistered": "kullanim", "DaySinceLastOrder": "dusus",
+    "NumberOfDeviceRegistered": "kullanim", "DaySinceLastOrder": "etkilesim",
     "SatisfactionScore": "destek", "Complain": "destek",
     "CashbackAmount": "parasal", "MaritalStatus": "demografi",
-    "PreferedOrderCat": "diger", "WarehouseToHome": "diger", "NumberOfAddress": "diger",
+    "PreferedOrderCat": "diger", "WarehouseToHome": "etkilesim", "NumberOfAddress": "etkilesim",
     # --- iranian ---
     "Subscription  Length": "tenure", "Charge  Amount": "parasal", "Customer Value": "parasal",
     "Seconds of Use": "kullanim", "Frequency of use": "kullanim", "Frequency of SMS": "kullanim",
@@ -64,16 +67,17 @@ HARITA = {
     "PrizmCode": "demografi", "ServiceArea": "demografi", "MaritalStatus_c2c": "demografi",
     "TruckOwner": "demografi", "RVOwner": "demografi", "OwnsComputer": "demografi",
     "OwnsMotorcycle": "demografi",
-    "HandsetPrice": "diger", "handsetprice_unknown": "diger", "CurrentEquipmentDays": "diger",
-    "Handsets": "diger", "HandsetModels": "diger", "HandsetRefurbished": "diger",
-    "HandsetWebCapable": "diger", "CreditRating": "diger", "AdjustmentsToCreditRating": "diger",
+    "HandsetPrice": "cihaz", "handsetprice_unknown": "cihaz", "CurrentEquipmentDays": "cihaz",
+    "Handsets": "cihaz", "HandsetModels": "cihaz", "HandsetRefurbished": "cihaz",
+    "HandsetWebCapable": "cihaz", "CreditRating": "kredi", "AdjustmentsToCreditRating": "kredi",
     "BuysViaMailOrder": "diger", "RespondsToMailOffers": "diger", "OptOutMailings": "diger",
     "NonUSTravel": "diger",
 }
 # not: cell2cell ve ecommerce'de 'MaritalStatus' çakışır; ikisi de demografi -> sorun yok.
 HARITA.setdefault("MaritalStatus", "demografi")
 
-KAVRAM_SIRA = ["tenure", "sozlesme", "kullanim", "dusus", "destek", "parasal", "odeme", "hizmet", "demografi", "diger"]
+KAVRAM_SIRA = ["tenure", "sozlesme", "kullanim", "dusus", "etkilesim", "destek",
+               "parasal", "kredi", "odeme", "hizmet", "cihaz", "demografi", "diger"]
 
 
 def kavram(feature: str) -> str:
