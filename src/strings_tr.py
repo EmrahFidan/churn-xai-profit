@@ -299,3 +299,41 @@ MSG5 = {
     "emp_sira": "EMP sıralaması (yüksek->düşük): {sira}",
     "bitti": "ADIM 5 (RQ3) tamamlandı. Yorum/karar kullanıcıya bırakıldı. Transfer (Adım 6) yapılmadı.",
 }
+
+# ===================== ADIM 6: koşullu transfer probe =====================
+TRANSFER_KARAR = {"dahil": "DAHİL", "kismi": "KISMÎ", "zayif": "ZAYIF"}
+FIG6_DOSYA = {
+    "prauc": "transfer_prauc_comparison.png",
+    "retention": "transfer_retention_ratio.png",
+}
+FIG6_BASLIK = {
+    "prauc": "Transfer probe — PR-AUC (transfer vs in-domain referans vs trivial)",
+    "retention": "Transfer koruma oranı (transfer / in-domain referans)",
+}
+EKSEN6 = {
+    "prauc": "PR-AUC",
+    "oran": "Koruma oranı (transfer / referans)",
+    "senaryo": "Senaryo",
+}
+KOLON6 = {
+    "senaryo": "Senaryo",
+    "yon": "Yön",
+    "ortak_kavram": "Ortak kavram sayısı",
+    "transfer": "Transfer PR-AUC",
+    "ref": "In-domain ref PR-AUC",
+    "tam_ref": "Tam-feature ref PR-AUC",
+    "trivial": "Trivial PR-AUC",
+    "oran": "Koruma oranı",
+    "recall": "Duyarlılık",
+    "precision": "Kesinlik",
+    "f1": "F1",
+    "karar": "Karar",
+    "kavram": "Kavram",
+    "kaynak_feature": "Kaynak feature",
+    "hedef_feature": "Hedef feature",
+}
+MSG6 = {
+    "senaryo": "{ad} ({yon}): ortak kavram={k} | transfer PR-AUC={tr:.3f} | ref={ref:.3f} "
+               "| trivial={tv:.3f} | oran={oran:.2f} -> {karar}",
+    "bitti": "ADIM 6 (transfer) tamamlandı. Yorum/karar kullanıcıya bırakıldı. Sağlamlık/yazım (Adım 7) yapılmadı.",
+}
