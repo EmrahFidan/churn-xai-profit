@@ -423,3 +423,23 @@ MSG8 = {
     "wilcoxon": "Eşli Wilcoxon (set×fold, n={n}): EMPC p={pe:.4f}, kâr p={pk:.4f}.",
     "bitti": "ADIM 8 tamamlandı. Kâr-odaklı baseline kıyaslandı; yorum/karar kullanıcıya bırakıldı.",
 }
+
+# ===================== ADIM 9: imza bulgu (predictability ≠ profitability) =====================
+FIG9_DOSYA = {"scatter": "prauc_vs_emp_scatter.png", "dagilim": "churner_value_distributions.png"}
+FIG9_BASLIK = {
+    "scatter": "İmza bulgu — tahmin edilebilirlik (PR-AUC) vs kârlılık (EMP)",
+    "dagilim": "Sadece churn eden müşterilerin CLV dağılımı (set bazında)",
+}
+EKSEN9 = {"prauc": "PR-AUC (tahmin edilebilirlik)", "emp": "EMP (kârlılık, kişi başı)",
+          "clv": "Churner CLV", "sayi": "Müşteri sayısı"}
+KOLON9 = {
+    "veri_seti": "Veri Seti", "pr_auc": "PR-AUC", "emp": "EMP",
+    "churner_medyan": "Churner CLV medyan", "churner_gini": "Churner CLV Gini",
+    "churner_cv": "Churner CLV CV", "churn_orani": "Churn oranı",
+}
+MSG9 = {
+    "korelasyon": "PR-AUC↔EMP: Spearman ρ={rho:.3f} (p={pr:.3f}), Pearson r={r:.3f} (p={pp:.3f}). "
+                  "n=5 küçük → trend/illüstrasyon, aşırı iddia yok.",
+    "sira": "PR-AUC sırası: {prs}  |  EMP sırası: {emps}  -> {yorum}",
+    "bitti": "ADIM 9 tamamlandı. İmza bulgu (tahmin edilebilirlik ≠ kârlılık) belgelendi.",
+}
