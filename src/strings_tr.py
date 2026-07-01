@@ -401,3 +401,25 @@ MSG7 = {
     "yontem": "Anlamlılık yöntemi: eşli skorlar (set×seed OOF PR-AUC, n={n}) üstünde Wilcoxon signed-rank.",
     "bitti": "ADIM 7 (sağlamlık) tamamlandı. Deney fazı bitti; yorum/karar kullanıcıya bırakıldı, sırada yazım.",
 }
+
+# ===================== ADIM 8: profit-driven baseline (ProfLogit) =====================
+YAKLASIM_AD = {"ours": "Bizimki (ham LightGBM + kâr-eşiği)", "proflogit": "ProfLogit (EMPC-maksimize)"}
+FIG8_DOSYA = {"empc": "proflogit_vs_ours_empc.png", "profit": "proflogit_vs_ours_profit.png"}
+FIG8_BASLIK = {
+    "empc": "ProfLogit vs bizimki — EMPC (5 set, fold ort. ± std)",
+    "profit": "ProfLogit vs bizimki — kâr (5 set, fold ort. ± std)",
+}
+KOLON8 = {
+    "veri_seti": "Veri Seti", "yaklasim": "Yaklaşım", "empc": "EMPC", "kar": "Kâr",
+    "roi": "ROI", "pr_auc": "PR-AUC", "recall": "Duyarlılık", "precision": "Kesinlik",
+    "f1": "F1", "p_empc": "p (EMPC, Wilcoxon)", "p_kar": "p (kâr, Wilcoxon)",
+}
+MSG8 = {
+    "set": "{set} / {yaklasim}: EMPC={empc:.4f} kâr={kar:.0f} ROI={roi:.2f} PR-AUC={pr:.3f} ({sure:.0f}s)",
+    "ornek": "{set}: ProfLogit için stratified örneklem n={n} (tam veri {N}), seed={seed}.",
+    "atif": "ProfLogit yöntemi: Stripling, vanden Broucke, Antonio, Baesens, Snoeck (2018), "
+            "'Profit maximizing logistic model for customer churn prediction using genetic algorithms' "
+            "(EMPC amaç fonksiyonu + genetik katsayı arama).",
+    "wilcoxon": "Eşli Wilcoxon (set×fold, n={n}): EMPC p={pe:.4f}, kâr p={pk:.4f}.",
+    "bitti": "ADIM 8 tamamlandı. Kâr-odaklı baseline kıyaslandı; yorum/karar kullanıcıya bırakıldı.",
+}
