@@ -1,8 +1,8 @@
-"""Model tanımları + hafif hiperparametre optimizasyonu (GPU yok).
+"""Model definitions + lightweight hyperparameter optimization (no GPU).
 
-Basitten güçlüye: Logistic Regression, Random Forest, XGBoost, LightGBM.
-HPO: RandomizedSearchCV, 5-kat, scoring=average_precision (PR-AUC; dengesiz veri).
-Aşırı tuning yok. Modeller n_jobs=1; paralellik arama (search) katmanında.
+From simple to strong: Logistic Regression, Random Forest, XGBoost, LightGBM.
+HPO: RandomizedSearchCV, 5-fold, scoring=average_precision (PR-AUC; imbalanced data).
+No excessive tuning. Models n_jobs=1; parallelism at the search layer.
 """
 from lightgbm import LGBMClassifier
 from sklearn.ensemble import RandomForestClassifier
@@ -14,10 +14,10 @@ MODEL_ADLARI = ["logreg", "rf", "xgboost", "lightgbm"]
 
 
 def model_uzayi(model_adi: str, seed: int):
-    """Model örneği + arama uzayı döndürür.
+    """Returns a model instance + search space.
 
-    Dönüş: (estimator, param_dist, n_iter, olcekle). Anahtarlar 'model__' önekli
-    (tam pipeline'da model adımı). olcekle=True yalnız LogReg için (StandardScaler).
+    Return: (estimator, param_dist, n_iter, olcekle). Keys are prefixed with 'model__'
+    (the model step in the full pipeline). olcekle=True only for LogReg (StandardScaler).
     """
     if model_adi == "logreg":
         est = LogisticRegression(max_iter=2000, solver="liblinear", random_state=seed)
@@ -64,14 +64,14 @@ def model_uzayi(model_adi: str, seed: int):
         }
         return est, dist, 40, False
 
-    raise ValueError(f"bilinmeyen model: {model_adi}")
+    raise ValueError(f"unknown model: {model_adi}")
 
 
 def hpo(pipeline_full, param_dist, n_iter, X, y, seed):
-    """RandomizedSearchCV ile en iyi parametreleri bulur (5-kat, PR-AUC).
+    """Finds the best parameters with RandomizedSearchCV (5-fold, PR-AUC).
 
-    Encoder'lar pipeline içinde olduğundan her katta yalnız eğitim verisine fit
-    edilir (sızıntı yok). Dönüş: (best_params, best_score).
+    Since the encoders are inside the pipeline, in each fold they are fit only on the
+    training data (no leakage). Return: (best_params, best_score).
     """
     cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=seed)
     rs = RandomizedSearchCV(

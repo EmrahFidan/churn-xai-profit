@@ -1,34 +1,34 @@
-"""Ortak figür stili ve kaydetme yardımcıları (tek yerde tanımlı, tekrarsız).
+"""Shared figure style and saving helpers (defined in one place, no repetition).
 
-Yayın kalitesi: seaborn whitegrid, dpi=300 kayıt, okunur fontlar, tutarlı palet.
-churn=0 / churn=1 tüm figürlerde sabit iki renge bağlanır.
+Publication quality: seaborn whitegrid, dpi=300 saving, readable fonts, consistent palette.
+churn=0 / churn=1 are bound to two fixed colors across all figures.
 """
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import seaborn as sns
 
 from . import config as cfg
-from . import strings_tr as S
+from . import strings as S
 
-# churn için sabit iki renk (tüm figürlerde aynı)
+# two fixed colors for churn (same across all figures)
 CHURN_RENK = {0: "#4C72B0", 1: "#C44E52"}
 PALET = [CHURN_RENK[0], CHURN_RENK[1]]
 
-# modeller için sabit renkler (eğri/bar figürleri)
+# fixed colors for models (curve/bar figures)
 MODEL_RENK = {
     "logreg": "#4C72B0",
     "rf": "#55A868",
     "xgboost": "#C44E52",
     "lightgbm": "#8172B3",
 }
-# kalibrasyon yöntemleri için sabit çizgi stilleri
+# fixed line styles for calibration methods
 YONTEM_STIL = {
     "ham": {"linestyle": ":", "color": "#7F7F7F"},
     "Platt": {"linestyle": "--", "color": "#4C72B0"},
     "Isotonic": {"linestyle": "-", "color": "#C44E52"},
 }
 
-# RQ1 dengeleme koşulları için sabit renkler
+# fixed colors for RQ1 resampling conditions
 KOSUL_RENK = {
     "baseline": "#7F7F7F",
     "class_weight": "#4C72B0",
@@ -39,7 +39,7 @@ KOSUL_RENK = {
 
 
 def uygula():
-    """Ortak temayı uygular (idempotent)."""
+    """Applies the shared theme (idempotent)."""
     sns.set_theme(style="whitegrid", context="notebook")
     mpl.rcParams.update({
         "figure.dpi": 110,
@@ -55,15 +55,15 @@ def uygula():
 
 
 def churn_legend(ax):
-    """Sabit churn renk/etiketleriyle figüre legend ekler."""
+    """Adds a legend to the figure with fixed churn colors/labels."""
     el = [mpl.patches.Patch(color=CHURN_RENK[k], label=S.CHURN_ETIKET[k]) for k in (0, 1)]
     ax.legend(handles=el, title="Churn")
 
 
 def kaydet(fig, set_adi: str, anahtar: str):
-    """Figürü outputs/figures/<set>/<dosya> olarak 300 dpi PNG kaydeder.
+    """Saves the figure as a 300 dpi PNG at outputs/figures/<set>/<dosya>.
 
-    anahtar, strings_tr.FIG_DOSYA içindeki anahtardır. Dönüş: kayıt yolu.
+    anahtar is the key in strings_tr.FIG_DOSYA. Return: the saved path.
     """
     d = cfg.FIGURES / set_adi
     d.mkdir(parents=True, exist_ok=True)

@@ -1,5 +1,5 @@
-"""churn-xai-profit kaynak paketi.
+"""churn-xai-profit source package.
 
-Adımların ağır/tekrarlı mantığı bu paketteki modüllerde toplanır; notebook ve
-%% script front-end'leri yalnızca bu fonksiyonları çağırır (mantık tek yerde).
+The heavy/repeated logic of each step lives in the modules of this package; the
+notebook and %% script front-ends only call these functions (logic in one place).
 """

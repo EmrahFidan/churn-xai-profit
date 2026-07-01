@@ -1,14 +1,14 @@
-"""ADIM 5 — RQ3: Maliyete duyarlı eşik, kâr/ROI ve EMP.
+"""STEP 5 — RQ3: Cost-sensitive threshold, profit/ROI and EMP.
 
-Açıklanan/operasyonel model: HAM/doğal-dağılım LightGBM (Adım 2 best_params),
-kalibrasyon katmanı YOK (ham olasılık zaten iyi kalibre; kâr doğru olasılık ister).
-Olasılıklar 5-kat out-of-fold üretilir (model gördüğü müşteriyi puanlamaz — sızıntı yok).
-Maliyet/değer için sihirli sayı yok: parametrik (c, γ, CLV) + duyarlılık.
+Explained/operational model: RAW/natural-distribution LightGBM (Step 2 best_params),
+NO calibration layer (raw probability is already well-calibrated; profit needs correct probability).
+Probabilities are produced 5-fold out-of-fold (the model does not score a customer it has seen — no leakage).
+No magic number for cost/value: parametric (c, γ, CLV) + sensitivity.
 
-Kâr matrisi (müşteri başı, eşik t, p=ham olasılık):
-  TP (tahmin churn & gerçek churn): γ·CLV − c
-  FP (tahmin churn & gerçek kalır):        − c
-  FN (tahmin kalır & gerçek churn):        − CLV
+Profit matrix (per customer, threshold t, p=raw probability):
+  TP (predict churn & actually churn): γ·CLV − c
+  FP (predict churn & actually stays):        − c
+  FN (predict stays & actually churn):        − CLV
   TN:                                         0
 """
 import json
@@ -26,7 +26,7 @@ from . import config as cfg
 from . import encode
 from . import evaluate as ev
 from . import plotstyle as ps
-from . import strings_tr as S
+from . import strings as S
 
 PARAM = cfg.CFG["profit"]
 
@@ -38,24 +38,24 @@ def _lgbm_params(set_adi):
 
 # ----------------------------- CLV -----------------------------
 def clv_hesapla(set_adi, df):
-    """Müşteri-başı CLV (uniform değil) + temel açıklaması. Negatif/0 ele alınır."""
+    """Per-customer CLV (not uniform) + basis explanation. Negative/0 is handled."""
     u = PARAM["ufuk_ay"]
     if set_adi == "telco":
         clv = df["MonthlyCharges"].astype(float) * u
-        temel = f"MonthlyCharges × {u} ay"
+        temel = f"MonthlyCharges × {u} mo"
     elif set_adi == "cell2cell":
         clv = df["MonthlyRevenue"].astype(float) * u
-        temel = f"MonthlyRevenue × {u} ay"
+        temel = f"MonthlyRevenue × {u} mo"
     elif set_adi == "bank":
         m = PARAM["banka_marj_yillik"]
         clv = df["Balance"].astype(float) * m * (u / 12.0)
-        temel = f"Balance × {m} yıllık marj × {u/12:.1f} yıl"
+        temel = f"Balance × {m} annual margin × {u/12:.1f} yr"
     elif set_adi == "ecommerce":
         clv = df["CashbackAmount"].astype(float) * u
-        temel = f"CashbackAmount (aylık değer proxy) × {u} ay"
+        temel = f"CashbackAmount (monthly value proxy) × {u} mo"
     elif set_adi == "iranian":
         clv = df["Customer Value"].astype(float)
-        temel = "Customer Value (doğrudan)"
+        temel = "Customer Value (direct)"
     else:
         raise ValueError(set_adi)
     clv = clv.clip(lower=0).to_numpy()
@@ -63,7 +63,7 @@ def clv_hesapla(set_adi, df):
 
 
 def oof_olasilik(set_adi, df, seed):
-    """5-kat out-of-fold ham olasılık (sızıntısız). Dönüş: (p_oof, y)."""
+    """5-fold out-of-fold raw probability (leakage-free). Returns: (p_oof, y)."""
     X = df.drop(columns=["churn"])
     y = df["churn"].to_numpy()
     pre = encode.on_isleyici(set_adi, df, olcekle=False)[0]
@@ -78,9 +78,9 @@ def oof_olasilik(set_adi, df, seed):
     return p, y
 
 
-# ----------------------------- kâr / eşik / ROI -----------------------------
+# ----------------------------- profit / threshold / ROI -----------------------------
 def kar(p, y, clv, c, gamma, t):
-    """Eşik t'de toplam kâr."""
+    """Total profit at threshold t."""
     pred = p >= t
     tp = pred & (y == 1)
     fn = (~pred) & (y == 1)
@@ -98,7 +98,7 @@ def en_iyi_esik(p, y, clv, c, gamma, esikler):
 
 
 def roi(p, y, clv, c, gamma, t):
-    """ROI = net kâr / toplam müdahale maliyeti (hedeflenen × c)."""
+    """ROI = net profit / total intervention cost (targeted × c)."""
     pred = p >= t
     maliyet = c * pred.sum()
     k = kar(p, y, clv, c, gamma, t)
@@ -106,7 +106,7 @@ def roi(p, y, clv, c, gamma, t):
 
 
 def naif(p, y, clv, c, gamma):
-    """Referans: herkese müdahale (t=0) ve hiç müdahale (t>1)."""
+    """Reference: intervene on everyone (t=0) and intervene on no one (t>1)."""
     hepsi = kar(p, y, clv, c, gamma, 0.0)
     hic = kar(p, y, clv, c, gamma, 1.1)
     return hepsi, hic
@@ -114,16 +114,16 @@ def naif(p, y, clv, c, gamma):
 
 # ----------------------------- EMP -----------------------------
 def emp(p, y, clv, c_ref, seed=None):
-    """Expected Maximum Profit for churn: γ ~ Beta(α,β) üstünde max kâr/kişi entegrali.
+    """Expected Maximum Profit for churn: integral of max profit/customer over γ ~ Beta(α,β).
 
-    Setler-arası kıyas için CLV ortalamaya normalize edilir (EMP = ortalama CLV'nin
-    kesri olarak kişi-başı beklenen maksimum kâr). Her γ için kâr-maksimize eşikteki
-    kişi-başı kâr, Beta yoğunluğuyla ağırlıklandırılır. Varsayım MSG5'te loglanır.
+    For cross-dataset comparison CLV is normalized to the mean (EMP = per-customer expected
+    maximum profit as a fraction of the mean CLV). For each γ, the per-customer profit at the
+    profit-maximizing threshold is weighted by the Beta density. The assumption is logged in MSG5.
     """
     a, b = PARAM["emp_beta"]
     ort = clv.mean() or 1.0
-    clv_n = clv / ort           # ortalama CLV = 1 birim
-    c_n = c_ref / ort           # maliyet de aynı birimde
+    clv_n = clv / ort           # mean CLV = 1 unit
+    c_n = c_ref / ort           # cost in the same unit
     esikler = np.linspace(0.0, 1.0, 101)
     gamalar = np.linspace(0.005, 0.995, 100)
     w = beta_dist.pdf(gamalar, a, b)
@@ -136,9 +136,9 @@ def emp(p, y, clv, c_ref, seed=None):
     return float(toplam)
 
 
-# ----------------------------- orkestrasyon -----------------------------
+# ----------------------------- orchestration -----------------------------
 def calistir_set(set_adi, df, seed):
-    """Bir set için OOF olasılık + CLV + (c,γ) taraması + EMP. Dönüş: dict."""
+    """OOF probability + CLV + (c,γ) sweep + EMP for one dataset. Returns: dict."""
     p, y = oof_olasilik(set_adi, df, seed)
     clv, temel = clv_hesapla(set_adi, df)
     ort = float(np.mean(clv))
@@ -162,7 +162,7 @@ def calistir_set(set_adi, df, seed):
             "satirlar": satirlar, "emp": e, "esikler": esikler}
 
 
-# ----------------------------- tablolar -----------------------------
+# ----------------------------- tables -----------------------------
 def tablo_ozet(tum):
     K = S.KOLON5
     rows = []
@@ -193,9 +193,9 @@ def tablo_clv(tum):
     return df
 
 
-# ----------------------------- figürler -----------------------------
+# ----------------------------- figures -----------------------------
 def _temsili(r):
-    """Temsili (c,γ): c=%5 ort_CLV, γ=0.3 (yoksa ilk)."""
+    """Representative (c,γ): c=5% of ort_CLV, γ=0.3 (or first if absent)."""
     oran = 0.05 if 0.05 in PARAM["c_oranlari"] else PARAM["c_oranlari"][0]
     g = 0.3 if 0.3 in PARAM["gamma_listesi"] else PARAM["gamma_listesi"][0]
     return r["ort_clv"] * oran, g, oran
@@ -206,9 +206,9 @@ def figur_profit_threshold(set_adi, r):
     egri = kar_egrisi(r["p"], r["y"], r["clv"], c, g, r["esikler"])
     tb = float(r["esikler"][int(np.argmax(egri))])
     fig, ax = plt.subplots(figsize=(7, 4.8))
-    ax.plot(r["esikler"], egri, color=ps.CHURN_RENK[0], label="Kâr eğrisi")
-    ax.axvline(tb, color=ps.CHURN_RENK[1], linestyle="-", label=f"Kâr-eşiği t*={tb:.2f}")
-    ax.axvline(0.5, color="#7F7F7F", linestyle="--", label="Doğruluk-eşiği t=0.5")
+    ax.plot(r["esikler"], egri, color=ps.CHURN_RENK[0], label="Profit curve")
+    ax.axvline(tb, color=ps.CHURN_RENK[1], linestyle="-", label=f"Profit threshold t*={tb:.2f}")
+    ax.axvline(0.5, color="#7F7F7F", linestyle="--", label="Accuracy threshold t=0.5")
     ax.set_xlabel(S.EKSEN5["esik"])
     ax.set_ylabel(S.EKSEN5["kar"])
     ax.set_title(S.FIG5_BASLIK["profit_threshold"].format(c=int(oran * 100), g=g, set=set_adi))
@@ -229,7 +229,7 @@ def figur_roi_sensitivity(set_adi, r):
     fig, ax = plt.subplots(figsize=(6, 4.8))
     im = ax.imshow(M, cmap="YlOrRd", aspect="auto", origin="lower")
     ax.set_xticks(range(len(gamalar))); ax.set_xticklabels(gamalar)
-    ax.set_yticks(range(len(oranlar))); ax.set_yticklabels([f"%{int(o*100)}" for o in oranlar])
+    ax.set_yticks(range(len(oranlar))); ax.set_yticklabels([f"{int(o*100)}%" for o in oranlar])
     for i in range(len(oranlar)):
         for j in range(len(gamalar)):
             ax.text(j, i, f"{M[i, j]:.1f}", ha="center", va="center", fontsize=9,

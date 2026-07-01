@@ -1,13 +1,14 @@
-"""ADIM 3 — RQ1: Dengeleme yöntemleri karşılaştırması (LightGBM sabit).
+"""STEP 3 — RQ1: Comparison of resampling methods (LightGBM fixed).
 
-Koşullar: baseline (doğal, eşik 0.5), class-weight (scale_pos_weight), SMOTENC/SMOTE,
-ADASYN, eşik kaydırma (max-F1; istatistiksel, kâr değil). KAZANAN SEÇİLMEZ — trade-off
-raporlanır.
+Conditions: baseline (natural, threshold 0.5), class-weight (scale_pos_weight), SMOTENC/SMOTE,
+ADASYN, threshold shifting (max-F1; statistical, not profit). NO WINNER IS SELECTED — the
+trade-off is reported.
 
-SIZINTI KURALI: tüm resampling, scale_pos_weight ve eşik seçimi YALNIZ fold-içi eğitimde.
-imblearn Pipeline: [prep] -> [resampler] -> [encode] -> [LightGBM]; resampler ham feature
-üstünde (ADASYN istisna: encode'dan sonra). Validation katı doğal bırakılır (kalibrasyon
-gerçek dağılımda ölçülür). Stratified 5-kat (seed=42), birincil skor PR-AUC.
+LEAKAGE RULE: all resampling, scale_pos_weight and threshold selection ONLY within the
+within-fold training. imblearn Pipeline: [prep] -> [resampler] -> [encode] -> [LightGBM];
+the resampler is on the raw features (ADASYN exception: after encode). The validation fold is
+left natural (calibration is measured on the real distribution). Stratified 5-fold (seed=42),
+primary score PR-AUC.
 """
 import json
 
@@ -27,14 +28,14 @@ from . import config as cfg
 from . import encode
 from . import evaluate as ev
 from . import plotstyle as ps
-from . import strings_tr as S
+from . import strings as S
 
 KOSULLAR = ["baseline", "class_weight", "smote", "adasyn", "threshold"]
-MODEL_KOSUL = ["baseline", "class_weight", "smote", "adasyn"]  # fit gereken (threshold baseline'ı kullanır)
+MODEL_KOSUL = ["baseline", "class_weight", "smote", "adasyn"]  # those needing a fit (threshold uses baseline)
 
 
 def _lgbm_params(set_adi):
-    """best_params_<set>.json'dan LightGBM hiperparametrelerini okur (model__ öneki sıyrılır)."""
+    """Reads LightGBM hyperparameters from best_params_<set>.json (model__ prefix stripped)."""
     yol = cfg.TABLES / f"best_params_{set_adi}.json"
     bp = json.loads(yol.read_text(encoding="utf-8")).get("lightgbm", {})
     return {k.replace("model__", ""): v for k, v in bp.items()}
@@ -48,14 +49,14 @@ def _lgbm(params, seed, scale_pos_weight=None):
 
 
 def _resampler(parts, seed):
-    """Kategorik varsa SMOTENC, tam sayısalsa SMOTE."""
+    """SMOTENC if categorical features exist, SMOTE if fully numeric."""
     if parts["nominal"]:
         return SMOTENC(categorical_features=parts["kat_idx"], random_state=seed)
     return SMOTE(random_state=seed)
 
 
 def _pipeline(parts, kosul, params, seed, spw):
-    """Bir koşul için imblearn Pipeline kurar (fit edilmemiş)."""
+    """Builds an imblearn Pipeline for one condition (not fit)."""
     adimlar = []
     if parts["prep"] is not None:
         adimlar.append(("hazirla", clone(parts["prep"])))
@@ -77,7 +78,7 @@ def _pipeline(parts, kosul, params, seed, spw):
 
 
 def _f1_esik(y, p):
-    """max-F1 veren eşiği döndürür (precision_recall_curve üzerinden)."""
+    """Returns the threshold that gives max-F1 (via precision_recall_curve)."""
     prec, rec, thr = precision_recall_curve(y, p)
     if len(thr) == 0:
         return 0.5
@@ -93,10 +94,10 @@ def _isletim_metrik(y, p, esik):
 
 
 def calistir_set_rq1(set_adi, df, seed):
-    """Bir set için tüm koşulları 5-kat CV ile değerlendirir.
+    """Evaluates all conditions for one set with 5-fold CV.
 
-    Dönüş: {kosul: {"oof": arr, "perfold": {metrik: [..]}}}. baseline'ın olasılığı
-    eşik-kaydırma koşulunda yeniden kullanılır (aynı model).
+    Return: {kosul: {"oof": arr, "perfold": {metric: [..]}}}. The baseline's probability
+    is reused in the threshold-shifting condition (same model).
     """
     X = df.drop(columns=["churn"])
     y = df["churn"].to_numpy()
@@ -128,7 +129,7 @@ def calistir_set_rq1(set_adi, df, seed):
             pf["recall"].append(rec); pf["precision"].append(pre); pf["F1"].append(f1)
             pf["ECE"].append(ev.ece(yva, p)); pf["Brier"].append(brier_score_loss(yva, p))
             pf["esik"].append(esik)
-        # eşik kaydırma: baseline modeli, max-F1 eşiği
+        # threshold shifting: baseline model, max-F1 threshold
         esik = _f1_esik(yva, p_baseline)
         res["threshold"]["oof"][va] = p_baseline
         rec, pre, f1 = _isletim_metrik(yva, p_baseline, esik)
@@ -141,7 +142,7 @@ def calistir_set_rq1(set_adi, df, seed):
     return res
 
 
-# ----------------------------- tablolar -----------------------------
+# ----------------------------- tables -----------------------------
 def _ort(x):
     a = np.asarray(x, float)
     return a.mean(), a.std()
@@ -153,7 +154,7 @@ def _fmt(x):
 
 
 def tablo_karsilastirma(tum):
-    """rq1_imbalance_comparison.csv (set × yöntem, mean ± std)."""
+    """rq1_imbalance_comparison.csv (set × method, mean ± std)."""
     K = S.KOLON3
     rows = []
     for s, res in tum.items():
@@ -172,7 +173,7 @@ def tablo_karsilastirma(tum):
 
 
 def tablo_esikler(tum):
-    """rq1_thresholds.csv (set × yöntem, seçilen eşik mean ± std)."""
+    """rq1_thresholds.csv (set × method, selected threshold mean ± std)."""
     K = S.KOLON3
     rows = []
     for s, res in tum.items():
@@ -184,7 +185,7 @@ def tablo_esikler(tum):
     return df
 
 
-# ----------------------------- figürler -----------------------------
+# ----------------------------- figures -----------------------------
 def _ortalama(res, k, metrik):
     return float(np.mean(res[k]["perfold"][metrik]))
 
@@ -241,10 +242,10 @@ def figur_pr_operating(set_adi, res, y):
         ap = _ortalama(res, k, "PR-AUC")
         ax.plot(rec, prec, color=ps.KOSUL_RENK[k], alpha=0.85,
                 label=f"{S.KOSUL_AD[k]} (PR-AUC={ap:.3f})")
-        # işletim noktası
+        # operating point
         r_op, p_op = _ortalama(res, k, "recall"), _ortalama(res, k, "precision")
         ax.scatter([r_op], [p_op], color=ps.KOSUL_RENK[k], edgecolor="black", zorder=5, s=60)
-    ax.axhline(y.mean(), color="#444444", linestyle=":", label=f"Taban (prevalans={y.mean():.3f})")
+    ax.axhline(y.mean(), color="#444444", linestyle=":", label=f"Baseline (prevalence={y.mean():.3f})")
     ax.set_xlabel(S.KOLON3["recall"] + " (recall)")
     ax.set_ylabel(S.KOLON3["precision"] + " (precision)")
     ax.set_ylim(0, 1)

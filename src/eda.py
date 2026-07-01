@@ -1,8 +1,8 @@
-"""Keşifsel veri analizi (EDA) — set bazında figürler + genel bakış tablosu.
+"""Exploratory data analysis (EDA) — per-dataset figures + overview table.
 
-Her etiketli set için outputs/figures/<set>/ altına 5 figür üretir ve
-outputs/tables/dataset_overview.csv yazar. churn=0/1 sabit renklerle gösterilir.
-Tüm gösterim metinleri strings_tr'den gelir.
+For each labeled dataset produces 5 figures under outputs/figures/<set>/ and
+writes outputs/tables/dataset_overview.csv. churn=0/1 is shown with fixed colors.
+All display texts come from strings_tr.
 """
 import math
 
@@ -13,9 +13,9 @@ from pandas.api.types import is_numeric_dtype
 
 from . import config as cfg
 from . import plotstyle as ps
-from . import strings_tr as S
+from . import strings as S
 
-KATEGORIK_MAX = 12  # bu eşiğin üstündeki kardinalite kategorik figürde atlanır
+KATEGORIK_MAX = 12  # cardinality above this threshold is skipped in the categorical figure
 
 
 def _sayisal_kolonlar(df):
@@ -31,14 +31,14 @@ def _baslik(anahtar, set_adi):
 
 
 def churn_dengesi(df, set_adi):
-    """churn_balance.png — churn 0/1 sayımları (sabit iki renk)."""
+    """churn_balance.png — churn 0/1 counts (two fixed colors)."""
     say = df["churn"].value_counts().reindex([0, 1]).fillna(0).astype(int)
     fig, ax = plt.subplots(figsize=(5, 4))
     ax.bar([S.CHURN_ETIKET[0], S.CHURN_ETIKET[1]], [say[0], say[1]],
            color=[ps.CHURN_RENK[0], ps.CHURN_RENK[1]])
     toplam = int(say.sum())
     for i, v in enumerate([say[0], say[1]]):
-        ax.text(i, v, f"{v}\n(%{100*v/toplam:.1f})", ha="center", va="bottom")
+        ax.text(i, v, f"{v}\n({100*v/toplam:.1f}%)", ha="center", va="bottom")
     ax.set_title(_baslik("churn_balance", set_adi))
     ax.set_xlabel(S.EKSEN["churn_durumu"])
     ax.set_ylabel(S.EKSEN["musteri_sayisi"])
@@ -48,7 +48,7 @@ def churn_dengesi(df, set_adi):
 
 
 def sayisal_dagilim(df, set_adi):
-    """numeric_distributions.png — sayısal değişkenlerin churn'e göre histogramları."""
+    """numeric_distributions.png — histograms of numeric variables by churn."""
     kols = _sayisal_kolonlar(df)
     n = len(kols)
     ncol = min(4, n) if n else 1
@@ -62,7 +62,7 @@ def sayisal_dagilim(df, set_adi):
         ax.set_title(c, fontsize=10)
         ax.set_xlabel(S.EKSEN["deger"])
         ax.set_ylabel(S.EKSEN["musteri_sayisi"])
-    for j in range(n, nrow * ncol):  # boş eksenleri gizle
+    for j in range(n, nrow * ncol):  # hide empty axes
         axes[j // ncol][j % ncol].axis("off")
     h, l = axes[0][0].get_legend_handles_labels()
     fig.legend(h, l, title="Churn", loc="upper right")
@@ -72,9 +72,9 @@ def sayisal_dagilim(df, set_adi):
 
 
 def kategorik_churn(df, set_adi):
-    """categorical_churn.png — düşük kardinaliteli kategoriklerde churn oranı.
+    """categorical_churn.png — churn rate for low-cardinality categoricals.
 
-    Dönüş: (fig, yol, atlanan_yuksek_kardinalite_listesi).
+    Returns: (fig, path, skipped_high_cardinality_list).
     """
     kategorik = _kategorik_kolonlar(df)
     kullan = [c for c in kategorik if df[c].nunique() <= KATEGORIK_MAX]
@@ -89,7 +89,7 @@ def kategorik_churn(df, set_adi):
             oran = df.groupby(c, observed=True)["churn"].mean().sort_values(ascending=False)
             ax.bar(oran.index.astype(str), oran.values, color=ps.CHURN_RENK[1])
             ax.axhline(df["churn"].mean(), color=ps.CHURN_RENK[0], linestyle="--",
-                       label="Genel oran")
+                       label="Overall rate")
             ax.set_title(c, fontsize=10)
             ax.set_xlabel(S.EKSEN["kategori"])
             ax.set_ylabel(S.EKSEN["churn_orani"])
@@ -99,7 +99,7 @@ def kategorik_churn(df, set_adi):
             axes[j // ncol][j % ncol].axis("off")
     else:
         fig, ax = plt.subplots(figsize=(6, 3))
-        ax.text(0.5, 0.5, "Düşük kardinaliteli kategorik değişken yok",
+        ax.text(0.5, 0.5, "No low-cardinality categorical feature",
                 ha="center", va="center")
         ax.axis("off")
     fig.suptitle(_baslik("categorical_churn", set_adi), y=1.0)
@@ -108,7 +108,7 @@ def kategorik_churn(df, set_adi):
 
 
 def korelasyon(df, set_adi):
-    """correlation_heatmap.png — sayısal değişken + churn korelasyon ısı haritası."""
+    """correlation_heatmap.png — correlation heatmap of numeric variables + churn."""
     kols = _sayisal_kolonlar(df) + ["churn"]
     corr = df[kols].corr(numeric_only=True)
     boyut = max(5, 0.45 * len(kols))
@@ -131,7 +131,7 @@ def korelasyon(df, set_adi):
 
 
 def eksiklik(df_ham_std, set_adi):
-    """missingness.png — temizlik öncesi kolon bazında eksik hücre sayısı."""
+    """missingness.png — per-column missing cell count before cleaning."""
     eksik = df_ham_std.isna().sum()
     eksik = eksik[eksik > 0].sort_values(ascending=False)
     fig, ax = plt.subplots(figsize=(7, max(3, 0.35 * max(1, len(eksik)))))
@@ -139,7 +139,7 @@ def eksiklik(df_ham_std, set_adi):
         ax.barh(eksik.index.astype(str)[::-1], eksik.values[::-1], color=ps.CHURN_RENK[0])
         ax.set_xlabel(S.EKSEN["eksik_sayisi"])
     else:
-        ax.text(0.5, 0.5, "Eksik veri yok", ha="center", va="center")
+        ax.text(0.5, 0.5, "No missing data", ha="center", va="center")
         ax.axis("off")
     ax.set_title(_baslik("missingness", set_adi))
     fig.tight_layout()
@@ -147,7 +147,7 @@ def eksiklik(df_ham_std, set_adi):
 
 
 def figurler_set(set_adi, df_temiz, df_ham_std):
-    """Bir set için 5 figürü üretir + kaydeder. Dönüş: {anahtar: yol} ve atlananlar."""
+    """Produces + saves the 5 figures for a dataset. Returns: {key: path} and the skipped ones."""
     yollar = {}
     _, yollar["churn_balance"] = churn_dengesi(df_temiz, set_adi)
     _, yollar["numeric_distributions"] = sayisal_dagilim(df_temiz, set_adi)
@@ -158,7 +158,7 @@ def figurler_set(set_adi, df_temiz, df_ham_std):
 
 
 def genel_bakis(etiketli, processed, holdout):
-    """dataset_overview.csv — 5 set yan yana + cell2cell_test etiketsiz notu."""
+    """dataset_overview.csv — 5 datasets side by side + cell2cell_test unlabeled note."""
     cfg.klasorleri_hazirla()
     satirlar = []
     for key in cfg.DATASETS:
@@ -174,7 +174,7 @@ def genel_bakis(etiketli, processed, holdout):
             S.KOLON["eksik_sonra"]: int(temiz.drop(columns=["churn"]).isna().sum().sum()),
             S.KOLON["not"]: "",
         })
-    # etiketsiz holdout notu
+    # unlabeled holdout note
     satirlar.append({
         S.KOLON["veri_seti"]: "cell2cell_test",
         S.KOLON["sektor"]: cfg.DATASETS["cell2cell"]["sector"],
@@ -183,7 +183,7 @@ def genel_bakis(etiketli, processed, holdout):
         S.KOLON["churn_yuzde"]: np.nan,
         S.KOLON["eksik_once"]: int(holdout["df"].drop(columns=["churn"]).isna().sum().sum()),
         S.KOLON["eksik_sonra"]: int(processed["cell2cell_test"].drop(columns=["churn"]).isna().sum().sum()),
-        S.KOLON["not"]: "Etiketsiz holdout — churn'e dayalı analizlere dahil edilmedi",
+        S.KOLON["not"]: "Unlabeled holdout — excluded from churn-based analyses",
     })
     df = pd.DataFrame(satirlar)
     df.to_csv(cfg.TABLES / "dataset_overview.csv", index=False)

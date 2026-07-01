@@ -1,9 +1,9 @@
-"""Değerlendirme: protokol, metrikler, figürler ve tablolar.
+"""Evaluation: protocol, metrics, figures and tables.
 
-Her etiketli set × her model: stratified 5-kat CV (seed=42), birincil skor PR-AUC.
-Encoding + (scaling) + model + kalibrasyon tek pipeline'da, fold içinde fit edilir
-(sızıntı yok). Kalibrasyon kalitesi Brier + ECE ile ham/Platt/Isotonic için ayrı
-hesaplanır. DENGELEME/RESAMPLING YOK — doğal dağılımda dürüst baseline.
+Each labeled set × each model: stratified 5-fold CV (seed=42), primary score PR-AUC.
+Encoding + (scaling) + model + calibration in a single pipeline, fit within the fold
+(no leakage). Calibration quality is computed separately with Brier + ECE for
+raw/Platt/Isotonic. NO RESAMPLING — an honest baseline on the natural distribution.
 """
 import json
 
@@ -24,14 +24,14 @@ from . import config as cfg
 from . import encode
 from . import models as models_mod
 from . import plotstyle as ps
-from . import strings_tr as S
+from . import strings as S
 
 YONTEM_ANAHTAR = ["ham", "Platt", "Isotonic"]
 
 
-# ----------------------------- metrikler -----------------------------
+# ----------------------------- metrics -----------------------------
 def ece(y, p, bins: int = 10) -> float:
-    """Expected Calibration Error (eşit genişlikli 10 kova, ağırlıklı |doğruluk-güven|)."""
+    """Expected Calibration Error (10 equal-width bins, weighted |accuracy-confidence|)."""
     y = np.asarray(y, dtype=float)
     p = np.asarray(p, dtype=float)
     kenar = np.linspace(0.0, 1.0, bins + 1)
@@ -55,13 +55,13 @@ def _fmt(deg) -> str:
     return f"{m:.4f} ± {s:.4f}"
 
 
-# --------------------------- fold değerlendirme ---------------------------
+# --------------------------- fold evaluation ---------------------------
 def degerlendir(fab, best_params, X, y, seed):
-    """Bir (set, model) için 5-kat değerlendirme + kalibrasyon.
+    """5-fold evaluation + calibration for one (set, model).
 
-    Dönüş: {"oof": {ham,Platt,Isotonic}, "perfold": {...metrik listeleri...}}.
-    Ayrım metrikleri (PR/ROC, 0.5 eşiği) kalibre edilmemiş olasılıktan; Brier/ECE
-    her üç yöntem için ayrı.
+    Return: {"oof": {ham,Platt,Isotonic}, "perfold": {...metric lists...}}.
+    Discrimination metrics (PR/ROC, 0.5 threshold) from the uncalibrated probability;
+    Brier/ECE separately for all three methods.
     """
     skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=seed)
     n = len(y)
@@ -98,10 +98,10 @@ def degerlendir(fab, best_params, X, y, seed):
 
 
 def calistir_set(set_adi, df, seed, model_adlari=None, kaydet_sema=True):
-    """Bir set için tüm modelleri çalıştırır (HPO + değerlendirme).
+    """Runs all models for one set (HPO + evaluation).
 
-    encoding_schema_<set>.csv ve best_params_<set>.json yazar. Dönüş:
-    {"sonuc": {model: degerlendir çıktısı + hpo_skor}, "best_params": {...}, "sema": ...}.
+    Writes encoding_schema_<set>.csv and best_params_<set>.json. Return:
+    {"sonuc": {model: degerlendir output + hpo_skor}, "best_params": {...}, "sema": ...}.
     """
     model_adlari = model_adlari or models_mod.MODEL_ADLARI
     X = df.drop(columns=["churn"])
@@ -132,7 +132,7 @@ def calistir_set(set_adi, df, seed, model_adlari=None, kaydet_sema=True):
     return {"sonuc": sonuc, "best_params": best_params, "sema": sema}
 
 
-# ----------------------------- yardımcılar -----------------------------
+# ----------------------------- helpers -----------------------------
 def pr_ortalama(res):
     return float(np.mean(res["perfold"]["ham"]["PR-AUC"]))
 
@@ -142,17 +142,17 @@ def ece_ortalamalari(res):
 
 
 def en_iyi_model(set_sonuc):
-    """PR-AUC ortalamasına göre en iyi model anahtarını döndürür."""
+    """Returns the best model key by mean PR-AUC."""
     return max(set_sonuc["sonuc"], key=lambda m: pr_ortalama(set_sonuc["sonuc"][m]))
 
 
 def en_iyi_kalibrasyon(res):
-    """En düşük ECE'ye sahip yöntemi döndürür (ham/Platt/Isotonic)."""
+    """Returns the method with the lowest ECE (ham/Platt/Isotonic)."""
     e = ece_ortalamalari(res)
     return min(e, key=e.get), e
 
 
-# ----------------------------- tablolar -----------------------------
+# ----------------------------- tables -----------------------------
 def tablo_performans(tum):
     """model_performance.csv — set × model, mean ± std."""
     K = S.KOLON2
@@ -172,7 +172,7 @@ def tablo_performans(tum):
 
 
 def tablo_kalibrasyon(tum):
-    """calibration_comparison.csv — set × model × yöntem, Brier + ECE."""
+    """calibration_comparison.csv — set × model × method, Brier + ECE."""
     K = S.KOLON2
     rows = []
     for s, r in tum.items():
@@ -189,7 +189,7 @@ def tablo_kalibrasyon(tum):
     return df
 
 
-# ----------------------------- figürler -----------------------------
+# ----------------------------- figures -----------------------------
 def _kaydet(fig, set_adi, dosya):
     d = cfg.FIGURES / set_adi
     d.mkdir(parents=True, exist_ok=True)
@@ -199,7 +199,7 @@ def _kaydet(fig, set_adi, dosya):
 
 
 def figur_pr(set_adi, set_sonuc, y):
-    """pr_curve.png — tüm modeller bir arada (out-of-fold)."""
+    """pr_curve.png — all models together (out-of-fold)."""
     fig, ax = plt.subplots(figsize=(6, 5))
     for m, res in set_sonuc["sonuc"].items():
         p = res["oof"]["ham"]
@@ -207,7 +207,7 @@ def figur_pr(set_adi, set_sonuc, y):
         ap = pr_ortalama(res)
         ax.plot(rec, prec, color=ps.MODEL_RENK[m], label=f"{S.MODEL_AD[m]} (PR-AUC={ap:.3f})")
     taban = y.mean()
-    ax.axhline(taban, color="#7F7F7F", linestyle=":", label=f"Taban (prevalans={taban:.3f})")
+    ax.axhline(taban, color="#7F7F7F", linestyle=":", label=f"Baseline (prevalence={taban:.3f})")
     ax.set_title(S.FIG2_BASLIK["pr"].format(set=set_adi))
     ax.set_xlabel(S.EKSEN2["recall"])
     ax.set_ylabel(S.EKSEN2["precision"])
@@ -218,14 +218,14 @@ def figur_pr(set_adi, set_sonuc, y):
 
 
 def figur_roc(set_adi, set_sonuc, y):
-    """roc_curve.png — tüm modeller bir arada (out-of-fold)."""
+    """roc_curve.png — all models together (out-of-fold)."""
     fig, ax = plt.subplots(figsize=(6, 5))
     for m, res in set_sonuc["sonuc"].items():
         p = res["oof"]["ham"]
         fpr, tpr, _ = roc_curve(y, p)
         auc = float(np.mean(res["perfold"]["ham"]["ROC-AUC"]))
         ax.plot(fpr, tpr, color=ps.MODEL_RENK[m], label=f"{S.MODEL_AD[m]} (ROC-AUC={auc:.3f})")
-    ax.plot([0, 1], [0, 1], color="#7F7F7F", linestyle=":", label="Rastgele")
+    ax.plot([0, 1], [0, 1], color="#7F7F7F", linestyle=":", label="Random")
     ax.set_title(S.FIG2_BASLIK["roc"].format(set=set_adi))
     ax.set_xlabel(S.EKSEN2["fpr"])
     ax.set_ylabel(S.EKSEN2["tpr"])
@@ -235,9 +235,9 @@ def figur_roc(set_adi, set_sonuc, y):
 
 
 def figur_kalibrasyon(set_adi, model_adi, res, y):
-    """calibration_curves.png — en iyi modelin ham/Platt/Isotonic güvenilirlik eğrileri."""
+    """calibration_curves.png — the best model's ham/Platt/Isotonic reliability curves."""
     fig, ax = plt.subplots(figsize=(6, 5.5))
-    ax.plot([0, 1], [0, 1], color="black", linestyle="-", linewidth=0.8, label="Mükemmel")
+    ax.plot([0, 1], [0, 1], color="black", linestyle="-", linewidth=0.8, label="Perfect")
     for key in YONTEM_ANAHTAR:
         p = res["oof"][key]
         frac, mean_pred = calibration_curve(y, p, n_bins=10, strategy="quantile")
@@ -256,7 +256,7 @@ def figur_kalibrasyon(set_adi, model_adi, res, y):
 
 
 def figur_model_kiyas(set_adi, set_sonuc):
-    """model_comparison.png — PR-AUC / Duyarlılık / F1 (modeller yan yana)."""
+    """model_comparison.png — PR-AUC / Recall / F1 (models side by side)."""
     modeller = list(set_sonuc["sonuc"].keys())
     metr = [("PR-AUC", "PR-AUC"), ("recall", S.KOLON2["recall"]), ("F1", "F1")]
     x = np.arange(len(metr))
@@ -278,7 +278,7 @@ def figur_model_kiyas(set_adi, set_sonuc):
 
 
 def figurler_set(set_adi, set_sonuc, y):
-    """Bir set için 4 figürü üretir. Dönüş: {anahtar: yol}."""
+    """Produces the 4 figures for one set. Return: {key: path}."""
     en_iyi = en_iyi_model(set_sonuc)
     yollar = {
         "pr": figur_pr(set_adi, set_sonuc, y),
@@ -289,9 +289,9 @@ def figurler_set(set_adi, set_sonuc, y):
     return yollar, en_iyi
 
 
-# ------------------------ iranian Status baskınlığı ------------------------
+# ------------------------ iranian Status dominance ------------------------
 def iranian_status_etkisi(df, seed):
-    """iranian'da 'Status' çıkarınca PR-AUC değişimi (LGBM, 5-kat). Dönüş: (full, drop)."""
+    """PR-AUC change when 'Status' is dropped in iranian (LGBM, 5-fold). Return: (full, drop)."""
     def ap(d):
         X = d.drop(columns=["churn"])
         y = d["churn"].to_numpy()

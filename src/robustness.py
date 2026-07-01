@@ -1,8 +1,8 @@
-"""ADIM 7 — Sağlamlık: kâr-zinciri ablation + tekrarlı koşu (CI) + anlamlılık.
+"""STEP 7 — Robustness: profit-chain ablation + repeated runs (CI) + significance.
 
-5 tohum (config.seeds) üstünden ortalama ± std + %95 CI. Model: HAM LightGBM
-(Adım 2 best_params). Setler ayrı; birleştirme yok. OOF olasılıklar (set, model, seed)
-bazında memoize edilir (parçalar arası tekrar hesap yok).
+Mean ± std + 95% CI over 5 seeds (config.seeds). Model: RAW LightGBM
+(Step 2 best_params). Sets are separate; no merging. OOF probabilities are memoized
+per (set, model, seed) (no recomputation across parts).
 """
 import json
 
@@ -26,10 +26,10 @@ from . import evaluate as ev
 from . import imbalance as imb
 from . import plotstyle as ps
 from . import profit as pr
-from . import strings_tr as S
+from . import strings as S
 
 SEEDS = cfg.CFG["seeds"]
-C_ORAN = cfg.CFG["profit"]["emp_c_oran"]   # referans maliyet oranı (%5)
+C_ORAN = cfg.CFG["profit"]["emp_c_oran"]   # reference cost ratio (5%)
 GAMMA = 0.30
 ABLATION_SETLERI = ["telco", "cell2cell"]
 _OOF = {}  # (set, model, seed) -> (p, y)
@@ -41,7 +41,7 @@ def _params(set_adi, anahtar):
 
 
 def _pipeline(model_adi, set_adi, df, seed):
-    """Koşula göre fit edilmemiş pipeline. model_adi: lgbm/logreg/xgboost/class_weight/smote."""
+    """Unfitted pipeline per condition. model_adi: lgbm/logreg/xgboost/class_weight/smote."""
     parts = encode.parcalar(set_adi, df, olcekle=False)
     y = df["churn"].to_numpy()
     spw = float((y == 0).sum() / max(1, (y == 1).sum()))
@@ -65,7 +65,7 @@ def _pipeline(model_adi, set_adi, df, seed):
 
 
 def oof(set_adi, df, model_adi, seed):
-    """5-kat OOF olasılık (memoize). Dönüş: (p, y)."""
+    """5-fold OOF probability (memoized). Returns: (p, y)."""
     key = (set_adi, model_adi, seed)
     if key in _OOF:
         return _OOF[key]
@@ -88,7 +88,7 @@ def _ci(vals):
     return m, s, m - h, m + h
 
 
-# ----------------------------- PARÇA 1: ablation -----------------------------
+# ----------------------------- PART 1: ablation -----------------------------
 KOSUL_MODEL = {"K0": ("lgbm", "profit"), "K1": ("lgbm", "acc"),
                "K2": ("class_weight", "profit"), "K3": ("logreg", "profit"),
                "K4": ("smote", "profit")}
@@ -138,7 +138,7 @@ def tablo_ablation(tum_ablation):
     return df
 
 
-# ----------------------------- PARÇA 2: CI -----------------------------
+# ----------------------------- PART 2: CI -----------------------------
 def robustness_set(set_adi, df):
     clv, _ = pr.clv_hesapla(set_adi, df)
     c = float(np.mean(clv)) * C_ORAN
@@ -169,9 +169,9 @@ def tablo_ci(tum_ci):
     return df
 
 
-# ----------------------------- PARÇA 3: anlamlılık -----------------------------
+# ----------------------------- PART 3: significance -----------------------------
 def anlamlilik(veriler):
-    """Model çiftleri (set×seed OOF PR-AUC eşli) Wilcoxon + kâr-eşiği vs accuracy eşli test."""
+    """Model pairs (set×seed OOF PR-AUC paired) Wilcoxon + profit-threshold vs accuracy paired test."""
     modeller = ["lgbm", "logreg", "xgboost"]
     ap = {m: [] for m in modeller}
     for s in cfg.DATASETS:
@@ -189,7 +189,7 @@ def anlamlilik(veriler):
             rows.append({K["kiyas"]: f"{ma} vs {mb} (PR-AUC)", K["test"]: "Wilcoxon",
                          K["istatistik"]: round(float(st), 2), K["p"]: round(float(pv), 5),
                          K["sonuc"]: S.ANLAMLI[pv < 0.05]})
-    # kâr-eşiği (K0) vs accuracy (K1): telco+cell2cell × seed eşli kâr
+    # profit-threshold (K0) vs accuracy (K1): telco+cell2cell × seed paired profit
     k0, k1 = [], []
     for s in ABLATION_SETLERI:
         clv, _ = pr.clv_hesapla(s, veriler[s])
@@ -201,7 +201,7 @@ def anlamlilik(veriler):
             k0.append(pr.kar(p, y, clv, c, GAMMA, t))
             k1.append(pr.kar(p, y, clv, c, GAMMA, 0.5))
     st, pv = wilcoxon(k0, k1)
-    rows.append({K["kiyas"]: "Kâr-eşiği (K0) vs accuracy (K1) — kâr", K["test"]: "Wilcoxon",
+    rows.append({K["kiyas"]: "Profit threshold (K0) vs accuracy (K1) — profit", K["test"]: "Wilcoxon",
                  K["istatistik"]: round(float(st), 2), K["p"]: round(float(pv), 5),
                  K["sonuc"]: S.ANLAMLI[pv < 0.05]})
     df = pd.DataFrame(rows)
@@ -209,7 +209,7 @@ def anlamlilik(veriler):
     return df, pmat, modeller, len(ap["lgbm"])
 
 
-# ----------------------------- figürler -----------------------------
+# ----------------------------- figures -----------------------------
 def _kaydet(fig, dosya):
     d = cfg.FIGURES / "_robust"
     d.mkdir(parents=True, exist_ok=True)
@@ -276,7 +276,7 @@ def figur_significance(pmat, modeller):
             if not np.isnan(M[i, j]):
                 ax.text(j, i, f"{M[i, j]:.3f}", ha="center", va="center", fontsize=10,
                         color="white" if M[i, j] < 0.05 else "black")
-    fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04, label="p-değeri")
+    fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04, label="p-value")
     ax.set_title(S.FIG7_BASLIK["significance"])
     fig.tight_layout()
     return _kaydet(fig, S.FIG7_DOSYA["significance"])

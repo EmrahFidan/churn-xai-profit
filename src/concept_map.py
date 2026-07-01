@@ -1,29 +1,29 @@
-"""Setler-arası sürücü tutarlılığı için KAVRAM HARİTASI (yorum katmanı).
+"""CONCEPT MAP for cross-dataset driver consistency (annotation layer).
 
-Her ham feature'ı sektör-bağımsız bir kavrama bağlar. Bu YALNIZCA SHAP sürücülerini
-kavram düzeyinde karşılaştırmak içindir; veriyi BİRLEŞTİRMEZ. Eşlenemeyen feature
-'diger' olur ve loglanır. Kavram adları (insan-okur) strings_tr'de değil burada
-kanonik anahtar; gösterim adı KAVRAM_AD'da.
+Maps each raw feature to a sector-independent concept. This is ONLY for comparing SHAP
+drivers at the concept level; it does NOT MERGE the data. Unmappable features become
+'diger' and are logged. Concept names (human-readable) are not in strings_tr but here;
+the canonical key is here, the display name is in KAVRAM_AD.
 """
 
-# kanonik kavram -> Türkçe gösterim
+# canonical concept -> English display
 KAVRAM_AD = {
-    "tenure": "İlişki süresi (tenure)",
-    "sozlesme": "Sözleşme / taahhüt",
-    "kullanim": "Kullanım hacmi",
-    "dusus": "Kullanım düşüşü",
-    "destek": "Şikâyet / destek / hizmet kalitesi",
-    "etkilesim": "Etkileşim / recency",
-    "parasal": "Parasal değer / harcama",
-    "kredi": "Kredi / risk",
-    "odeme": "Ödeme / fatura tipi",
-    "hizmet": "Hizmet / abonelik kapsamı",
-    "cihaz": "Cihaz / ekipman",
-    "demografi": "Demografi",
-    "diger": "Diğer",
+    "tenure": "Relationship duration (tenure)",
+    "sozlesme": "Contract / commitment",
+    "kullanim": "Usage volume",
+    "dusus": "Usage decline",
+    "destek": "Complaint / support / service quality",
+    "etkilesim": "Engagement / recency",
+    "parasal": "Monetary value / spending",
+    "kredi": "Credit / risk",
+    "odeme": "Payment / billing type",
+    "hizmet": "Service / subscription scope",
+    "cihaz": "Device / equipment",
+    "demografi": "Demographics",
+    "diger": "Other",
 }
 
-# ham feature adı -> kanonik kavram (5 set; adlar setler arası genelde benzersiz)
+# raw feature name -> canonical concept (5 datasets; names are generally unique across sets)
 HARITA = {
     # --- telco ---
     "tenure": "tenure", "Contract": "sozlesme",
@@ -73,7 +73,7 @@ HARITA = {
     "BuysViaMailOrder": "diger", "RespondsToMailOffers": "diger", "OptOutMailings": "diger",
     "NonUSTravel": "diger",
 }
-# not: cell2cell ve ecommerce'de 'MaritalStatus' çakışır; ikisi de demografi -> sorun yok.
+# note: 'MaritalStatus' collides between cell2cell and ecommerce; both are demografi -> no problem.
 HARITA.setdefault("MaritalStatus", "demografi")
 
 KAVRAM_SIRA = ["tenure", "sozlesme", "kullanim", "dusus", "etkilesim", "destek",
@@ -81,5 +81,5 @@ KAVRAM_SIRA = ["tenure", "sozlesme", "kullanim", "dusus", "etkilesim", "destek",
 
 
 def kavram(feature: str) -> str:
-    """Ham feature adını kanonik kavrama eşler (eşlenemeyen -> 'diger')."""
+    """Maps a raw feature name to its canonical concept (unmappable -> 'diger')."""
     return HARITA.get(feature, "diger")

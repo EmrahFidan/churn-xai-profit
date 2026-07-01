@@ -1,19 +1,19 @@
-"""Olasılık kalibrasyonu — Platt (sigmoid) ve Isotonic.
+"""Probability calibration — Platt (sigmoid) and Isotonic.
 
-Kalibratör CV içinde, yalnız eğitim verisinden öğrenilir (test sızdırmaz):
-CalibratedClassifierCV ile sarılmış pipeline, eğitim katında fit edilir.
+The calibrator is learned within CV, only from the training data (no test leakage):
+the pipeline wrapped with CalibratedClassifierCV is fit on the training fold.
 """
 from sklearn.calibration import CalibratedClassifierCV
 
-# strings_tr anahtarlarıyla uyumlu yöntem listesi
+# method list compatible with strings_tr keys
 YONTEMLER = [("sigmoid", "Platt"), ("isotonic", "Isotonic")]
 
 
 def kalibre(fab, best_params: dict, method: str, cv: int = 3):
-    """Verilen pipeline fabrikası + parametrelerle kalibre edici döndürür (fit edilmemiş).
+    """Returns a calibrator built from the given pipeline factory + parameters (not fit).
 
-    `fab` taze bir Pipeline üretir; `method` 'sigmoid' (Platt) veya 'isotonic'.
-    İçteki cv yalnız eğitim verisini böler (kalibrasyon eğitim verisinden).
+    `fab` produces a fresh Pipeline; `method` is 'sigmoid' (Platt) or 'isotonic'.
+    The inner cv splits only the training data (calibration from the training data).
     """
     taban = fab()
     taban.set_params(**best_params)

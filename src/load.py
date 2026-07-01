@@ -1,16 +1,16 @@
-"""Veri seti yükleme ve standardizasyon.
+"""Dataset loading and standardization.
 
-Her seti data/raw/'dan (etiketsiz holdout data/holdout/'tan) yükler, hedefi tek
-isme ('churn', 0/1) çeker, kimlik kolonlarını düşürür (loglar). Tek seferde tek
-set; setler asla birleştirilmez. Bu adımda ENCODING YAPILMAZ — kategorikler ham
-bırakılır.
+Loads each dataset from data/raw/ (the unlabeled holdout from data/holdout/),
+normalizes the target to a single name ('churn', 0/1), and drops identifier
+columns (logged). One dataset at a time; datasets are never merged. NO ENCODING
+is done in this step — categoricals are left raw.
 """
 import pandas as pd
 from pandas.api.types import is_numeric_dtype
 
 from . import config as cfg
 
-# Set bazında düşürülecek kimlik kolonları
+# Identifier columns to drop, per dataset
 ID_KOLON = {
     "telco": ["customerID"],
     "cell2cell": ["CustomerID"],
@@ -23,10 +23,10 @@ _NEGATIF = {"no", "false", "0"}
 
 
 def _ikili_churn(s: pd.Series) -> pd.Series:
-    """Hedef seriyi 0/1'e çevirir. Çevrilemeyen (etiketsiz) değerler NaN kalır.
+    """Converts the target series to 0/1. Values that cannot be converted (unlabeled) remain NaN.
 
-    Sayısal 0/1 ya da metinsel Yes/No / True/False kabul eder. Etiketsiz holdout
-    için tüm değerler boştur ve NaN olarak korunur (nullable Int64).
+    Accepts numeric 0/1 or textual Yes/No / True/False. For the unlabeled holdout
+    all values are empty and are preserved as NaN (nullable Int64).
     """
     if is_numeric_dtype(s):
         return pd.to_numeric(s, errors="coerce").astype("Int64")
@@ -36,10 +36,10 @@ def _ikili_churn(s: pd.Series) -> pd.Series:
 
 
 def standardize(df: pd.DataFrame, key: str, hedef_kolon: str):
-    """Kimlik kolonlarını düşürür, hedefi 'churn'e çevirir.
+    """Drops identifier columns and converts the target to 'churn'.
 
-    Dönüş: (yeni_df, dusurulen_kimlik_kolonlari). 'churn' kolonu en sona eklenir;
-    feature kolon adlarına dokunulmaz.
+    Returns: (new_df, dropped_identifier_columns). The 'churn' column is appended
+    at the end; feature column names are left untouched.
     """
     df = df.copy()
     dusurulen = [c for c in ID_KOLON.get(key, []) if c in df.columns]
@@ -52,16 +52,16 @@ def standardize(df: pd.DataFrame, key: str, hedef_kolon: str):
 
 
 def yukle_etiketli():
-    """5 etiketli seti yükler ve standardize eder.
+    """Loads and standardizes the 5 labeled datasets.
 
-    Dönüş: key -> {df, sector, dropped, raw_shape, raw}. 'df' standardize edilmiş
-    (churn int), 'raw' ham yüklenmiş kopyadır (eksiklik figürü/genel bakış için).
+    Returns: key -> {df, sector, dropped, raw_shape, raw}. 'df' is standardized
+    (churn int), 'raw' is the raw loaded copy (for the missingness figure/overview).
     """
     out = {}
     for key, d in cfg.DATASETS.items():
         raw = pd.read_csv(cfg.RAW / d["file"], low_memory=False)
         std, dusurulen = standardize(raw, key, d["target"])
-        assert std["churn"].notna().all(), f"{key}: etiketli sette boş churn var"
+        assert std["churn"].notna().all(), f"{key}: empty churn in labeled dataset"
         std["churn"] = std["churn"].astype(int)
         out[key] = {
             "df": std,
@@ -74,10 +74,10 @@ def yukle_etiketli():
 
 
 def yukle_holdout():
-    """Etiketsiz cell2cell test holdout'unu yükler (cell2cell şemasıyla aynı).
+    """Loads the unlabeled cell2cell test holdout (same schema as cell2cell).
 
-    churn kolonu tamamen NaN'dır; EDA/leakage'ın churn'e dayalı kısımlarına dahil
-    edilmez, yalnızca temizliği yapılıp ayrı saklanır.
+    The churn column is entirely NaN; it is not included in the churn-based parts
+    of EDA/leakage, it is only cleaned and stored separately.
     """
     raw = pd.read_csv(cfg.HOLDOUT / cfg.HOLDOUT_DOSYA, low_memory=False)
     std, dusurulen = standardize(raw, "cell2cell", cfg.DATASETS["cell2cell"]["target"])

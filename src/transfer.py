@@ -1,11 +1,12 @@
-"""ADIM 6 — Koşullu transfer probe (barajlı, dürüst).
+"""STEP 6 — Conditional transfer probe (thresholded, honest).
 
-Bir sette eğitilen modelin başka sette ne kadar genellediğini ölçer. Setler
-birleştirilmez; transfer = "kaynakta fit, hedefte predict". Ortak feature uzayı:
-concept_map kavramlarından HER İKİ sette de SAYISAL temsilcisi olanlar (kavram başına
-tek temsilci, kaynak/hedefte en yüksek önemli sayısal feature). Ölçek farkı için
-scaler YALNIZ kaynakta fit edilir (hedeften sızıntı yok). Model: HAM LightGBM
-(kaynak best_params). Sonuç barajla üç kategoriye atanır: DAHİL / KISMÎ / ZAYIF.
+Measures how well a model trained on one set generalizes to another set. Sets are
+not merged; transfer = "fit on source, predict on target". Shared feature space:
+concept_map concepts that have a NUMERIC representative in BOTH sets (one
+representative per concept, the highest-importance numeric feature in source/target).
+For the scale difference, the scaler is fit ONLY on the source (no leakage from
+target). Model: RAW LightGBM (source best_params). The result is assigned to three
+categories by threshold: INCLUDED / PARTIAL / WEAK.
 """
 import json
 
@@ -22,17 +23,17 @@ from sklearn.preprocessing import StandardScaler
 from . import concept_map as km
 from . import config as cfg
 from . import evaluate as ev
-from . import strings_tr as S
+from . import strings as S
 
-# senaryolar: (anahtar, ad, kaynak, hedef, tip)
+# scenarios: (anahtar, ad, kaynak, hedef, tip)
 SENARYOLAR = [
-    ("A1", "Cell2Cell -> Iranian", "cell2cell", "iranian", "sektör-içi"),
-    ("A2", "Iranian -> Cell2Cell", "iranian", "cell2cell", "sektör-içi"),
-    ("B1", "telco -> bank", "telco", "bank", "sektör-ötesi"),
-    ("B2", "bank -> telco", "bank", "telco", "sektör-ötesi"),
+    ("A1", "Cell2Cell -> Iranian", "cell2cell", "iranian", "intra-sector"),
+    ("A2", "Iranian -> Cell2Cell", "iranian", "cell2cell", "intra-sector"),
+    ("B1", "telco -> bank", "telco", "bank", "cross-sector"),
+    ("B2", "bank -> telco", "bank", "telco", "cross-sector"),
 ]
-ESIK_DAHIL = 0.70    # koruma oranı barajı
-TRIVIAL_KAT = 1.10   # trivial'ı "net geçme" katsayısı
+ESIK_DAHIL = 0.70    # retention ratio threshold
+TRIVIAL_KAT = 1.10   # coefficient for "clearly beating" trivial
 
 
 def _lgbm_params(set_adi):
@@ -41,7 +42,7 @@ def _lgbm_params(set_adi):
 
 
 def temsilciler(set_adi, df):
-    """Kavram -> en yüksek önemli SAYISAL temsilci feature (o sette)."""
+    """Concept -> highest-importance NUMERIC representative feature (in that set)."""
     imp = pd.read_csv(cfg.TABLES / f"rq2_global_importance_{set_adi}.csv")
     skor = dict(zip(imp[S.KOLON4["feature"]], imp[S.KOLON4["mean_abs_shap"]]))
     rep = {}
@@ -56,7 +57,7 @@ def temsilciler(set_adi, df):
 
 
 def ortak_kavramlar(kaynak_set, kaynak_df, hedef_set, hedef_df):
-    """İki sette de sayısal temsilcisi olan kavramlar + eşleme. Dönüş: (kavramlar, map)."""
+    """Concepts that have a numeric representative in both sets + mapping. Returns: (concepts, map)."""
     rk = temsilciler(kaynak_set, kaynak_df)
     rh = temsilciler(hedef_set, hedef_df)
     ortak = [k for k in km.KAVRAM_SIRA if k in rk and k in rh]
@@ -65,7 +66,7 @@ def ortak_kavramlar(kaynak_set, kaynak_df, hedef_set, hedef_df):
 
 
 def _matris(df, esleme, rol):
-    """Ortak kavram uzayında matris (kolonlar = kavramlar, sıralı)."""
+    """Matrix in the shared concept space (columns = concepts, ordered)."""
     idx = 0 if rol == "kaynak" else 1
     kols = [esleme[k][idx] for k in esleme]
     X = df[kols].astype(float).copy()
@@ -74,7 +75,7 @@ def _matris(df, esleme, rol):
 
 
 def in_domain_ref(hedef_set, hedef_df, esleme, seed):
-    """Hedef setin KENDİ içinde, ortak-kavram uzayında 5-kat OOF PR-AUC (tavan)."""
+    """5-fold OOF PR-AUC WITHIN the target set itself, in the shared-concept space (ceiling)."""
     X = _matris(hedef_df, esleme, "hedef")
     y = hedef_df["churn"].to_numpy()
     params = _lgbm_params(hedef_set)
@@ -89,7 +90,7 @@ def in_domain_ref(hedef_set, hedef_df, esleme, seed):
 
 
 def tam_ref(hedef_set):
-    """Adım 2 tam-feature LightGBM PR-AUC'si (bağlam; 'x.xxxx ± ...' -> float)."""
+    """Step 2 full-feature LightGBM PR-AUC (context; 'x.xxxx ± ...' -> float)."""
     perf = pd.read_csv(cfg.TABLES / "model_performance.csv")
     K = S.KOLON2
     satir = perf[(perf[K["veri_seti"]] == hedef_set) & (perf[K["model"]] == "LightGBM")]
@@ -98,14 +99,14 @@ def tam_ref(hedef_set):
     return np.nan
 
 
-# semantik (elle sabit) temsilciler — önem'e göre seçilmez; aynı operasyonel olgu
+# semantic (hand-fixed) representatives — not selected by importance; same operational phenomenon
 SEMANTIK = [
-    ("Kullanım hacmi (süre)", "MonthlyMinutes", "Seconds of Use", "dakika/süre temelli kullanım hacmi"),
-    ("Kullanım sıklığı (arama adedi)", "PeakCallsInOut", "Frequency of use",
-     "zirve gelen/giden arama adedi: kullanım sıklığının tekil ölçütü (dakika ayrı kavram)"),
-    ("Şikâyet/destek", "CustomerCareCalls", "Complains", "müşteri hizmetleri teması ~ şikâyet sinyali"),
-    ("İlişki süresi", "MonthsInService", "Subscription  Length", "abonelik/hizmet süresi"),
-    ("Parasal değer", "MonthlyRevenue", "Customer Value", "müşterinin parasal değeri"),
+    ("Usage volume (duration)", "MonthlyMinutes", "Seconds of Use", "minute/duration-based usage volume"),
+    ("Usage frequency (call count)", "PeakCallsInOut", "Frequency of use",
+     "peak incoming/outgoing call count: the single measure of usage frequency (minutes is a separate concept)"),
+    ("Complaint/support", "CustomerCareCalls", "Complains", "customer service contact ~ complaint signal"),
+    ("Relationship duration", "MonthsInService", "Subscription  Length", "subscription/service tenure"),
+    ("Monetary value", "MonthlyRevenue", "Customer Value", "the customer's monetary value"),
 ]
 
 
@@ -116,7 +117,7 @@ def _karar(transfer, ref, trivial, oran):
 
 
 def _degerlendir(anahtar, ad, kaynak_set, hedef_set, tip, esleme, esleme_tipi, veriler, seed):
-    """Verilen kavram->(kaynak_col, hedef_col) eşlemesiyle transferi ölçer."""
+    """Measures transfer using the given concept->(source_col, target_col) mapping."""
     ksrc, ktgt = veriler[kaynak_set], veriler[hedef_set]
     Xk = _matris(ksrc, esleme, "kaynak")
     yk = ksrc["churn"].to_numpy()
@@ -146,25 +147,25 @@ def _degerlendir(anahtar, ad, kaynak_set, hedef_set, tip, esleme, esleme_tipi, v
 
 
 def calistir_senaryo(anahtar, ad, kaynak_set, hedef_set, tip, veriler, seed):
-    """Önem-temelli temsilcilerle transfer (otomatik ortak-kavram eşlemesi)."""
+    """Transfer with importance-based representatives (automatic shared-concept mapping)."""
     _, esleme = ortak_kavramlar(kaynak_set, veriler[kaynak_set], hedef_set, veriler[hedef_set])
     return _degerlendir(anahtar, ad, kaynak_set, hedef_set, tip, esleme, "onem", veriler, seed)
 
 
 def calistir_semantik(anahtar, ad, kaynak_set, hedef_set, veriler, seed):
-    """Semantik (elle sabit) temsilcilerle transfer — yalnız telekom-içi çift."""
+    """Transfer with semantic (hand-fixed) representatives — only the within-telecom pair."""
     esleme, atlanan = {}, []
     for label, c2c, iran, _ in SEMANTIK:
         if c2c not in veriler["cell2cell"].columns or iran not in veriler["iranian"].columns:
             atlanan.append(label)
             continue
         esleme[label] = (c2c, iran) if kaynak_set == "cell2cell" else (iran, c2c)
-    r = _degerlendir(anahtar, ad, kaynak_set, hedef_set, "sektör-içi", esleme, "semantik", veriler, seed)
+    r = _degerlendir(anahtar, ad, kaynak_set, hedef_set, "intra-sector", esleme, "semantik", veriler, seed)
     r["atlanan"] = atlanan
     return r
 
 
-# ----------------------------- tablolar -----------------------------
+# ----------------------------- tables -----------------------------
 def tablo_sonuc(sonuclar):
     K = S.KOLON6
     rows = []
@@ -198,7 +199,7 @@ def tablo_feature_map(sonuclar):
 
 
 def tablo_feature_map_semantic():
-    """Semantik (elle sabit) eşleme + seçim gerekçeleri."""
+    """Semantic (hand-fixed) mapping + selection rationales."""
     K = S.KOLON6
     rows = [{K["kavram"]: label, K["c2c_kolon"]: c2c, K["iran_kolon"]: iran, K["gerekce"]: ger}
             for label, c2c, iran, ger in SEMANTIK]
@@ -207,7 +208,7 @@ def tablo_feature_map_semantic():
     return df
 
 
-# ----------------------------- figürler -----------------------------
+# ----------------------------- figures -----------------------------
 def _kaydet(fig, dosya):
     d = cfg.FIGURES / "_transfer"
     d.mkdir(parents=True, exist_ok=True)
@@ -223,12 +224,12 @@ def figur_prauc(sonuclar):
     w = 0.26
     fig, ax = plt.subplots(figsize=(8, 5))
     ax.bar(x - w, [r["transfer"] for r in sonuclar], w, label="Transfer", color=ps.CHURN_RENK[1])
-    ax.bar(x, [r["ref"] for r in sonuclar], w, label="In-domain referans", color=ps.CHURN_RENK[0])
-    ax.bar(x + w, [r["trivial"] for r in sonuclar], w, label="Trivial (prevalans)", color="#7F7F7F")
+    ax.bar(x, [r["ref"] for r in sonuclar], w, label="In-domain reference", color=ps.CHURN_RENK[0])
+    ax.bar(x + w, [r["trivial"] for r in sonuclar], w, label="Trivial (prevalence)", color="#7F7F7F")
     for i, r in enumerate(sonuclar):
         ax.plot([i - 1.4 * w, i + 0.4 * w], [r["ref"] * ESIK_DAHIL] * 2, color="black",
                 linestyle=":", linewidth=1.2)
-    ax.plot([], [], color="black", linestyle=":", label=f"Baraj (%{int(ESIK_DAHIL*100)} ref)")
+    ax.plot([], [], color="black", linestyle=":", label=f"Threshold ({int(ESIK_DAHIL*100)}% ref)")
     ax.set_xticks(x)
     ax.set_xticklabels([f"{r['anahtar']}\n{r['ad']}" for r in sonuclar], fontsize=8)
     ax.set_ylabel(S.EKSEN6["prauc"])
@@ -242,11 +243,11 @@ def figur_retention(sonuclar):
     from . import plotstyle as ps
     etk = [r["anahtar"] for r in sonuclar]
     oran = [r["oran"] for r in sonuclar]
-    renk = [ps.KOSUL_RENK["smote"] if r["tip"] == "sektör-içi" else ps.KOSUL_RENK["adasyn"] for r in sonuclar]
+    renk = [ps.KOSUL_RENK["smote"] if r["tip"] == "intra-sector" else ps.KOSUL_RENK["adasyn"] for r in sonuclar]
     fig, ax = plt.subplots(figsize=(8, 5))
     ax.bar(range(len(sonuclar)), oran, color=renk)
-    ax.axhspan(0.70, 0.80, color="green", alpha=0.12, label="Baraj bandı (%70–80)")
-    ax.axhline(1.0, color="#444444", linestyle="--", linewidth=1, label="Referans seviyesi (1.0)")
+    ax.axhspan(0.70, 0.80, color="green", alpha=0.12, label="Threshold band (70–80%)")
+    ax.axhline(1.0, color="#444444", linestyle="--", linewidth=1, label="Reference level (1.0)")
     ax.set_xticks(range(len(sonuclar)))
     ax.set_xticklabels([f"{r['anahtar']}\n{r['tip']}" for r in sonuclar], fontsize=8)
     ax.set_ylabel(S.EKSEN6["oran"])
@@ -257,7 +258,7 @@ def figur_retention(sonuclar):
 
 
 def figur_semantic_vs_importance(onem_sonuclar, semantik_sonuclar):
-    """A1/A2: semantik vs önem-temelli koruma oranı (baraj bandı + trivial/ref işareti)."""
+    """A1/A2: semantic vs importance-based retention ratio (threshold band + trivial/ref marker)."""
     from . import plotstyle as ps
     anahtarlar = [r["anahtar"] for r in semantik_sonuclar]
     onem = {r["anahtar"]: r for r in onem_sonuclar}
@@ -266,14 +267,14 @@ def figur_semantic_vs_importance(onem_sonuclar, semantik_sonuclar):
     fig, ax = plt.subplots(figsize=(7.5, 5))
     o_oran = [onem[a]["oran"] for a in anahtarlar]
     s_oran = [r["oran"] for r in semantik_sonuclar]
-    ax.bar(x - w / 2, o_oran, w, label="Önem-temelli eşleme", color="#7F7F7F")
-    ax.bar(x + w / 2, s_oran, w, label="Semantik eşleme", color=ps.CHURN_RENK[1])
-    ax.axhspan(0.70, 0.80, color="green", alpha=0.12, label="Baraj bandı (%70–80)")
+    ax.bar(x - w / 2, o_oran, w, label="Importance-based mapping", color="#7F7F7F")
+    ax.bar(x + w / 2, s_oran, w, label="Semantic mapping", color=ps.CHURN_RENK[1])
+    ax.axhspan(0.70, 0.80, color="green", alpha=0.12, label="Threshold band (70–80%)")
     for i, r in enumerate(semantik_sonuclar):
         tr_oran = r["trivial"] / r["ref"] if r["ref"] > 0 else 0.0
         ax.plot([i - 0.7 * w, i + 0.7 * w], [tr_oran, tr_oran], color="black",
                 linestyle=":", linewidth=1.3)
-    ax.plot([], [], color="black", linestyle=":", label="Trivial / referans")
+    ax.plot([], [], color="black", linestyle=":", label="Trivial / reference")
     ax.set_xticks(x)
     ax.set_xticklabels([f"{a}\n{onem[a]['ad']}" for a in anahtarlar], fontsize=8)
     ax.set_ylabel(S.EKSEN6["oran"])

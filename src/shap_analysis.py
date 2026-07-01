@@ -1,9 +1,9 @@
-"""ADIM 4 — RQ2: TreeSHAP açıklanabilirlik + setler-arası sürücü tutarlılığı.
+"""STEP 4 — RQ2: TreeSHAP explainability + cross-dataset driver consistency.
 
-Açıklanan model: HAM/doğal-dağılım LightGBM (dengeleme YOK, kalibrasyon YOK), Adım 2
-best_params ile TÜM veri üstünde fit (seed=42). shap.TreeExplainer ile exact TreeSHAP.
-Encoded kolonların önemi ham feature'a toplanır; kavram haritasıyla sektörler arası
-karşılaştırılır (veri birleştirilmez).
+Explained model: RAW/natural-distribution LightGBM (NO balancing, NO calibration), fit on
+ALL data with Step 2 best_params (seed=42). Exact TreeSHAP via shap.TreeExplainer.
+Importance of encoded columns is aggregated back to the raw feature; compared across
+sectors via the concept map (data is not merged).
 """
 import json
 
@@ -19,9 +19,9 @@ from . import config as cfg
 from . import encode
 from . import evaluate as ev
 from . import plotstyle as ps
-from . import strings_tr as S
+from . import strings as S
 
-ORNEKLEM_SINIR = 15000  # bu satırdan büyük setlerde SHAP için stratified örneklem
+ORNEKLEM_SINIR = 15000  # stratified sample for SHAP on datasets larger than this
 
 
 def _lgbm_params(set_adi):
@@ -30,7 +30,7 @@ def _lgbm_params(set_adi):
 
 
 def _orijinal(name, nominal):
-    """Encoded kolon adını ham feature'a indirger ('num__x'->'x', 'nom__c_kat'->'c')."""
+    """Reduces an encoded column name to the raw feature ('num__x'->'x', 'nom__c_kat'->'c')."""
     if name.startswith("num__"):
         return name[5:]
     if name.startswith("nom__"):
@@ -43,7 +43,7 @@ def _orijinal(name, nominal):
 
 
 def _etiket(name, nominal):
-    """Okunur gösterim etiketi (ham token korunur)."""
+    """Readable display label (raw token preserved)."""
     if name.startswith("num__"):
         return name[5:]
     if name.startswith("nom__"):
@@ -56,9 +56,9 @@ def _etiket(name, nominal):
 
 
 def hazirla(set_adi, df, seed):
-    """Model + encode'u TÜM veride fit eder, SHAP için (örneklenmiş) matris döndürür.
+    """Fits model + encoding on ALL data, returns the (sampled) matrix for SHAP.
 
-    Dönüş: dict {model, Z, isimler, etiketler, orijinaller, nominal, proba, X_raw_ornek,
+    Returns: dict {model, Z, isimler, etiketler, orijinaller, nominal, proba, X_raw_ornek,
     n_ornek, N}.
     """
     X = df.drop(columns=["churn"])
@@ -79,7 +79,7 @@ def hazirla(set_adi, df, seed):
     N = len(y)
     if N > ORNEKLEM_SINIR:
         rng = np.random.RandomState(seed)
-        # stratified örneklem
+        # stratified sample
         idx = np.hstack([
             rng.choice(np.where(y == k)[0],
                        size=int(round(ORNEKLEM_SINIR * (y == k).mean())), replace=False)
@@ -100,7 +100,7 @@ def hazirla(set_adi, df, seed):
 
 
 def shap_hesap(h):
-    """TreeSHAP değerleri + beklenen değer (pozitif sınıf)."""
+    """TreeSHAP values + expected value (positive class)."""
     explainer = shap.TreeExplainer(h["model"])
     sv = explainer.shap_values(h["Z"])
     if isinstance(sv, list):
@@ -115,9 +115,9 @@ def shap_hesap(h):
     return np.asarray(sv), float(ev)
 
 
-# ----------------------------- önem (aggregate) -----------------------------
+# ----------------------------- importance (aggregate) -----------------------------
 def onem_orijinal(sv, orijinaller):
-    """Encoded kolon mean|SHAP|'larını ham feature'a toplar. Dönüş: Series(sıralı)."""
+    """Aggregates encoded-column mean|SHAP| values to the raw feature. Returns: Series(sorted)."""
     mas = np.abs(sv).mean(axis=0)
     s = pd.Series(mas, index=orijinaller).groupby(level=0).sum().sort_values(ascending=False)
     return s
@@ -132,7 +132,7 @@ def tablo_global(set_adi, onem):
     return df
 
 
-# ----------------------------- global figürler -----------------------------
+# ----------------------------- global figures -----------------------------
 def figur_beeswarm(set_adi, sv, h):
     plt.figure()
     shap.summary_plot(sv, h["Z"], feature_names=h["etiketler"], max_display=15, show=False)
@@ -158,7 +158,7 @@ def figur_importance(set_adi, onem):
 
 
 def figur_dependence(set_adi, sv, h, onem):
-    # tek-kolonlu (sayısal) en güçlü ham feature'lar
+    # strongest single-column (numeric) raw features
     tekil = [f for f in onem.index if f"num__{f}" in h["isimler"]][:4]
     n = max(1, len(tekil))
     ncol = 2 if n > 1 else 1
@@ -177,7 +177,7 @@ def figur_dependence(set_adi, sv, h, onem):
     return ev._kaydet(fig, set_adi, S.FIG4_DOSYA["dependence"])
 
 
-# ----------------------------- tekil (local) -----------------------------
+# ----------------------------- individual (local) -----------------------------
 def figur_waterfall(set_adi, sv, ev_base, h, idx, anahtar):
     expl = shap.Explanation(values=sv[idx], base_values=ev_base,
                             data=h["Z"][idx], feature_names=h["etiketler"])
@@ -193,7 +193,7 @@ def figur_waterfall(set_adi, sv, ev_base, h, idx, anahtar):
 
 
 def tablo_local(set_adi, sv, h, hi, lo):
-    """Seçilen 2 müşterinin profili (en etkili 6 feature) + olasılık."""
+    """Profile of the 2 selected customers (6 most influential features) + probability."""
     K = S.KOLON4
     rows = []
     for durum, idx in [("high", hi), ("low", lo)]:
@@ -212,9 +212,9 @@ def tablo_local(set_adi, sv, h, hi, lo):
     return df
 
 
-# ----------------------------- setler-arası tutarlılık -----------------------------
+# ----------------------------- cross-dataset consistency -----------------------------
 def kavram_paylari(onem):
-    """Ham feature önemini kavrama toplar, pay (0-1) döndürür."""
+    """Aggregates raw-feature importance into concepts, returns share (0-1)."""
     pay = {}
     for f, v in onem.items():
         k = km.kavram(f)
@@ -224,7 +224,7 @@ def kavram_paylari(onem):
 
 
 def tutarlilik(tum_onem):
-    """rq2_driver_consistency.csv + matris. tum_onem={set: Series}. Dönüş: (df, matris)."""
+    """rq2_driver_consistency.csv + matrix. tum_onem={set: Series}. Returns: (df, matris)."""
     setler = list(tum_onem.keys())
     paylar = {s: kavram_paylari(o) for s, o in tum_onem.items()}
     matris = pd.DataFrame(
@@ -232,7 +232,7 @@ def tutarlilik(tum_onem):
     )
     for s in setler:
         matris[s] = [round(paylar[s].get(k, 0.0), 4) for k in km.KAVRAM_SIRA]
-    # her sette top-3 kavram -> tutarlılık sayacı
+    # top-3 concepts per dataset -> consistency counter
     top3 = {s: set(pd.Series(paylar[s]).sort_values(ascending=False).head(3).index) for s in setler}
     matris[S.KOLON4["top3_say"]] = [sum(k in top3[s] for s in setler) for k in km.KAVRAM_SIRA]
     matris.to_csv(cfg.TABLES / "rq2_driver_consistency.csv", index=False)
@@ -252,7 +252,7 @@ def figur_tutarlilik(matris, setler):
         for j in range(len(setler)):
             ax.text(j, i, f"{deger[i, j]:.2f}", ha="center", va="center", fontsize=8,
                     color="black" if deger[i, j] < deger.max() * 0.6 else "white")
-    fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04, label="Önem payı")
+    fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04, label="Importance share")
     ax.set_title(S.FIG4_BASLIK["consistency"])
     ax.set_xlabel("Veri seti")
     ax.set_ylabel(S.EKSEN4["kavram"])

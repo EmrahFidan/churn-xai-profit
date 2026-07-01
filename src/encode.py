@@ -1,12 +1,12 @@
-"""Encoding / önişleme — SIZINTI YOK (encoder'lar yalnız train-fold'da fit edilir).
+"""Encoding / preprocessing — NO LEAKAGE (encoders are fit only on the train fold).
 
-sklearn Pipeline + ColumnTransformer döndürür; gerçek fit CV katı içinde olur
-(global encode edilmiş CSV kaydedilmez). Target/mean encoding kullanılmaz.
+Returns an sklearn Pipeline + ColumnTransformer; the actual fit happens inside the
+CV fold (no globally encoded CSV is saved). Target/mean encoding is not used.
 
-cell2cell'e özel (kilitli kararlar):
-- HandsetPrice: string -> sayısal, 'Unknown'/parse edilemez -> NaN -> train medyanı;
-  ayrıca handsetprice_unknown 0/1 bayrağı eklenir.
-- ServiceArea: en sık 15 kategori + 'Other', sonra one-hot.
+cell2cell-specific (locked decisions):
+- HandsetPrice: string -> numeric, 'Unknown'/unparseable -> NaN -> train median;
+  additionally a handsetprice_unknown 0/1 flag is added.
+- ServiceArea: most frequent 15 categories + 'Other', then one-hot.
 """
 import pandas as pd
 from pandas.api.types import is_numeric_dtype
@@ -16,14 +16,14 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 from . import config as cfg
-from . import strings_tr as S
+from . import strings as S
 
 
 class HamHazirla(BaseEstimator, TransformerMixin):
-    """cell2cell yüksek-kardinalite önişlemi (fold içinde fit edilir, sızıntısız).
+    """cell2cell high-cardinality preprocessing (fit within the fold, leakage-free).
 
-    HandsetPrice -> sayısal + handsetprice_unknown bayrağı (medyan train'den);
-    ServiceArea -> en sık `topn` kategori + 'Other'.
+    HandsetPrice -> numeric + handsetprice_unknown flag (median from train);
+    ServiceArea -> most frequent `topn` categories + 'Other'.
     """
 
     def __init__(self, topn: int = 15):
@@ -45,7 +45,7 @@ class HamHazirla(BaseEstimator, TransformerMixin):
 
 
 def _ornek_kolonlar(set_adi, feats):
-    """Önişlem sonrası kolon adlarını/rolleri belirler (yapısal metadata, sızıntı değil)."""
+    """Determines post-preprocessing column names/roles (structural metadata, not leakage)."""
     if set_adi == "cell2cell":
         ornek = HamHazirla().fit_transform(feats)
     else:
@@ -56,10 +56,10 @@ def _ornek_kolonlar(set_adi, feats):
 
 
 def on_isleyici(set_adi: str, df: pd.DataFrame, olcekle: bool):
-    """Set + model tipine göre önişleyici Pipeline döndürür (fit edilmemiş).
+    """Returns a preprocessor Pipeline based on dataset + model type (not fit).
 
-    olcekle=True (LogReg) -> sayısallara StandardScaler; ağaç modelleri için False.
-    Dönüş: (pipeline, sema) — sema={sayisal, nominal, ozel}.
+    olcekle=True (LogReg) -> StandardScaler on numerics; False for tree models.
+    Returns: (pipeline, sema) — sema={sayisal, nominal, ozel}.
     """
     feats = df.drop(columns=["churn"])
     ozel = set_adi == "cell2cell"
@@ -79,11 +79,12 @@ def on_isleyici(set_adi: str, df: pd.DataFrame, olcekle: bool):
 
 
 def parcalar(set_adi: str, df: pd.DataFrame, olcekle: bool = False):
-    """Önişlem parçalarını AYRI döndürür (resampler'ı prep ile encode arasına koymak için).
+    """Returns the preprocessing pieces SEPARATELY (to place the resampler between prep and encode).
 
-    Dönüş: {prep, ct, sayisal, nominal, kolonlar, kat_idx}. `prep` cell2cell için
-    HamHazirla, diğerlerinde None. `kat_idx` resampler (SMOTENC) için kategorik kolon
-    indeksleri (önişlem sonrası kolon sırasına göre). `ct` yalnız encode (prep hariç).
+    Returns: {prep, ct, sayisal, nominal, kolonlar, kat_idx}. `prep` is HamHazirla
+    for cell2cell, None otherwise. `kat_idx` are the categorical column indices for
+    the resampler (SMOTENC), following the post-preprocessing column order. `ct` is
+    encode only (excluding prep).
     """
     feats = df.drop(columns=["churn"])
     ozel = set_adi == "cell2cell"
@@ -105,7 +106,7 @@ def parcalar(set_adi: str, df: pd.DataFrame, olcekle: bool = False):
 
 
 def sema_yaz(set_adi: str, sema: dict):
-    """encoding_schema_<set>.csv yazar (kolon, rol, not). Dönüş: yol."""
+    """Writes encoding_schema_<set>.csv (column, role, note). Returns: path."""
     cfg.klasorleri_hazirla()
     satir = []
     ozel_kolon = {"HandsetPrice", "handsetprice_unknown", "ServiceArea"} if sema["ozel"] else set()

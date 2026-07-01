@@ -1,9 +1,9 @@
-"""ADIM 9 — İmza bulgu: tahmin edilebilirlik (PR-AUC) ≠ kârlılık (EMP).
+"""STEP 9 — Signature finding: predictability (PR-AUC) ≠ profitability (EMP).
 
-YENİ deney yok. Adım 2 PR-AUC (model_performance.csv, LightGBM) + Adım 5 EMP
-(rq3_profit_summary.csv) + churner CLV dağılımı kullanılır. Hipotez: yüksek-PR-AUC
-sette (iranian) churner değeri dar/düşük → düşük EMP; düşük-PR-AUC (telco) geniş/yüksek
-→ yüksek EMP. n=5 küçük → trend/illüstrasyon (aşırı iddia yok).
+No NEW experiment. Uses Step 2 PR-AUC (model_performance.csv, LightGBM) + Step 5 EMP
+(rq3_profit_summary.csv) + churner CLV distribution. Hypothesis: in the high-PR-AUC
+set (iranian) the churner value is narrow/low → low EMP; in the low-PR-AUC set (telco)
+it is wide/high → high EMP. n=5 is small → trend/illustration (no over-claiming).
 """
 import matplotlib.pyplot as plt
 import numpy as np
@@ -13,7 +13,7 @@ from scipy.stats import pearsonr, spearmanr
 from . import config as cfg
 from . import plotstyle as ps
 from . import profit as pr
-from . import strings_tr as S
+from . import strings as S
 
 
 def gini(x):
@@ -26,7 +26,7 @@ def gini(x):
 
 
 def _prauc_lightgbm():
-    """model_performance.csv'den LightGBM PR-AUC (ortalama) — set -> float."""
+    """LightGBM PR-AUC (mean) from model_performance.csv — set -> float."""
     df = pd.read_csv(cfg.TABLES / "model_performance.csv")
     K = S.KOLON2
     alt = df[df[K["model"]] == "LightGBM"]
@@ -34,14 +34,14 @@ def _prauc_lightgbm():
 
 
 def _emp():
-    """rq3_profit_summary.csv'den EMP (set başına sabit) — set -> float."""
+    """EMP from rq3_profit_summary.csv (constant per set) — set -> float."""
     df = pd.read_csv(cfg.TABLES / "rq3_profit_summary.csv")
     K = S.KOLON5
     return {s: float(g[K["emp"]].iloc[0]) for s, g in df.groupby(K["veri_seti"])}
 
 
 def kanit_tablosu(veriler):
-    """signature_evidence.csv üretir + DataFrame döndürür."""
+    """Produces signature_evidence.csv + returns a DataFrame."""
     prauc, emp = _prauc_lightgbm(), _emp()
     K = S.KOLON9
     rows = []
@@ -104,7 +104,7 @@ def figur_dagilim(churner_clv):
         cc = churner_clv[s]
         ax.hist(cc, bins=30, color=ps.CHURN_RENK[1], alpha=0.85)
         ax.axvline(np.median(cc), color=ps.CHURN_RENK[0], linestyle="--",
-                   label=f"medyan={np.median(cc):.0f}")
+                   label=f"median={np.median(cc):.0f}")
         ax.set_title(f"{s}\nGini={gini(cc):.2f}", fontsize=10)
         ax.set_xlabel(S.EKSEN9["clv"])
         ax.set_ylabel(S.EKSEN9["sayi"])

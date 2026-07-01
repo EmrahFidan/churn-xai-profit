@@ -1,14 +1,15 @@
-"""ADIM 8 — Kâr-odaklı baseline: ProfLogit vs bizim yaklaşım.
+"""STEP 8 — Profit-oriented baseline: ProfLogit vs our approach.
 
-'Kâr odaklıysan neden kâr-odaklı eğitilen modelle kıyaslamadın?' itirazını kapatır.
-İki yaklaşım (5 set, stratified 5-kat, seed=42, aynı CLV/kâr parametreleri, aynı encode+scale):
-  (A) Bizimki : ham LightGBM (Adım 2 best_params) + kâr-maksimize eşik t*.
-  (B) ProfLogit: lojistik katsayıları doğrudan EMPC-maksimize eden model.
+Closes the objection 'if you are profit-oriented, why didn't you compare against a
+profit-oriented trained model?'.
+Two approaches (5 sets, stratified 5-fold, seed=42, same CLV/profit parameters, same encode+scale):
+  (A) Ours     : raw LightGBM (Step 2 best_params) + profit-maximizing threshold t*.
+  (B) ProfLogit: model that directly EMPC-maximizes the logistic coefficients.
 
-ProfLogit yöntemi bilimsel atıf: Stripling, vanden Broucke, Antonio, Baesens, Snoeck (2018),
+ProfLogit method scientific citation: Stripling, vanden Broucke, Antonio, Baesens, Snoeck (2018),
 "Profit maximizing logistic model for customer churn prediction using genetic algorithms."
-EMPC amaç fonksiyonu + gerçek-kodlu genetik katsayı arama (warm-start: lojistik çözümü).
-Tüm fit/eşik/optimizasyon YALNIZ fold-içi (sızıntı yok).
+EMPC objective function + real-coded genetic coefficient search (warm-start: logistic solution).
+All fit/threshold/optimization is ONLY within-fold (no leakage).
 """
 import json
 import time
@@ -30,12 +31,12 @@ from . import encode
 from . import evaluate as ev
 from . import plotstyle as ps
 from . import profit as pr
-from . import strings_tr as S
+from . import strings as S
 
 GAMMA = 0.30
 C_ORAN = cfg.CFG["profit"]["emp_c_oran"]
-ORNEKLEM = 15000            # cell2cell için ProfLogit hız örneklemi
-POP, GEN, SABIR = 40, 80, 15   # genetik: popülasyon, nesil, erken durdurma sabrı
+ORNEKLEM = 15000            # ProfLogit speed subsample for cell2cell
+POP, GEN, SABIR = 40, 80, 15   # genetic: population, generations, early-stopping patience
 
 
 def _lgbm_params(set_adi):
@@ -43,11 +44,11 @@ def _lgbm_params(set_adi):
     return {k.replace("model__", ""): v for k, v in bp.items()}
 
 
-# ----------------------------- hızlı EMPC (GA fitness) -----------------------------
+# ----------------------------- fast EMPC (GA fitness) -----------------------------
 def _empc_hizli(scores, clv_y, c, gplus1, w):
-    """Skor sırasına göre EMPC (const'suz; GA sıralaması için). O(n log n)."""
+    """EMPC by score order (const-free; for GA ranking). O(n log n)."""
     order = np.argsort(-scores)
-    cc = np.cumsum(clv_y[order])            # top-m churner değeri
+    cc = np.cumsum(clv_y[order])            # top-m churner value
     k = np.arange(1, len(scores) + 1)
     base = gplus1[:, None] * cc[None, :] - c * k[None, :]   # (G, n)
     perg = np.maximum(base.max(axis=1), 0.0)
@@ -55,7 +56,7 @@ def _empc_hizli(scores, clv_y, c, gplus1, w):
 
 
 class ProfLogit:
-    """EMPC-maksimize lojistik (gerçek-kodlu GA, warm-start = MLE lojistik)."""
+    """EMPC-maximizing logistic (real-coded GA, warm-start = MLE logistic)."""
 
     def __init__(self, c, seed, pop=POP, gen=GEN, sabir=SABIR):
         self.c, self.seed, self.pop, self.gen, self.sabir = c, seed, pop, gen, sabir
@@ -63,19 +64,19 @@ class ProfLogit:
     def fit(self, Z, y, clv):
         rng = np.random.RandomState(self.seed)
         n, d = Z.shape
-        Zb = np.hstack([np.ones((n, 1)), Z])          # bias sütunu
+        Zb = np.hstack([np.ones((n, 1)), Z])          # bias column
         clv_y = clv * y
         a, b = cfg.CFG["profit"]["emp_beta"]
         gamalar = np.linspace(0.005, 0.995, 60)
         w = beta_dist.pdf(gamalar, a, b); w = w / w.sum()
         gplus1 = gamalar + 1.0
 
-        # warm-start: MLE lojistik katsayıları (anchor); GA yalnız kâra doğru nudge eder,
-        # warm-start'tan sapma cezalandırılır (aşırı-uyum/yön bozulması engellenir).
+        # warm-start: MLE logistic coefficients (anchor); GA only nudges toward profit,
+        # deviation from the warm-start is penalized (overfitting/direction distortion is prevented).
         lr = LogisticRegression(max_iter=1000, solver="liblinear").fit(Z, y)
         taban = np.concatenate([lr.intercept_, lr.coef_.ravel()])
         base = _empc_hizli(Zb @ taban, clv_y, self.c, gplus1, w)
-        lam = 0.05 * abs(base)                         # sapma (anchor) ceza katsayısı
+        lam = 0.05 * abs(base)                         # deviation (anchor) penalty coefficient
 
         def uygunluk(theta):
             return _empc_hizli(Zb @ theta, clv_y, self.c, gplus1, w) - lam * np.sum((theta - taban) ** 2)
@@ -86,16 +87,16 @@ class ProfLogit:
         en_iyi, en_iyi_fit, durgun = pop[fit.argmax()].copy(), fit.max(), 0
 
         for _ in range(self.gen):
-            yeni = [en_iyi.copy()]                     # elitizm
+            yeni = [en_iyi.copy()]                     # elitism
             while len(yeni) < self.pop:
-                # turnuva seçimi + konveks harman (warm-start çevresinde kal)
+                # tournament selection + convex blend (stay around the warm-start)
                 i, j = rng.randint(self.pop), rng.randint(self.pop)
                 p1 = pop[i] if fit[i] > fit[j] else pop[j]
                 i, j = rng.randint(self.pop), rng.randint(self.pop)
                 p2 = pop[i] if fit[i] > fit[j] else pop[j]
                 alpha = rng.rand(d + 1)
                 cocuk = alpha * p1 + (1 - alpha) * p2
-                mask = rng.rand(d + 1) < 0.1              # mutasyon
+                mask = rng.rand(d + 1) < 0.1              # mutation
                 cocuk[mask] += rng.normal(0, 0.1, mask.sum())
                 yeni.append(cocuk)
             pop = np.array(yeni)
@@ -115,7 +116,7 @@ class ProfLogit:
         return np.column_stack([1 - p, p])
 
 
-# ----------------------------- protokol -----------------------------
+# ----------------------------- protocol -----------------------------
 def _ornekle(df, seed):
     if len(df) <= ORNEKLEM:
         return df, len(df), len(df)
@@ -127,7 +128,7 @@ def _ornekle(df, seed):
 
 
 def calistir_set(set_adi, df, seed):
-    """5-kat: her fold'da (A) LGBM+kâr-eşiği ve (B) ProfLogit. Dönüş: per-fold metrikler + n."""
+    """5-fold: in each fold (A) LGBM+profit-threshold and (B) ProfLogit. Returns: per-fold metrics + n."""
     df_s, n, N = _ornekle(df, seed)
     X = df_s.drop(columns=["churn"])
     y = df_s["churn"].to_numpy()
@@ -145,13 +146,13 @@ def calistir_set(set_adi, df, seed):
     for tr, va in skf.split(X, y):
         ytr, yva = y[tr], y[va]
         clv_va = clv[va]
-        # (A) bizimki
+        # (A) ours
         pipe = clone(pre_ham)
         Ztr = pipe.fit_transform(X.iloc[tr])
         Zva = pipe.transform(X.iloc[va])
         lgbm = LGBMClassifier(random_state=seed, n_jobs=-1, verbose=-1, **lp).fit(Ztr, ytr)
         p_a = lgbm.predict_proba(Zva)[:, 1]
-        # (B) proflogit (ölçekli girdi)
+        # (B) proflogit (scaled input)
         pipe2 = clone(pre_olc)
         Ztr2 = np.asarray(pipe2.fit_transform(X.iloc[tr]))
         Zva2 = np.asarray(pipe2.transform(X.iloc[va]))
@@ -170,7 +171,7 @@ def calistir_set(set_adi, df, seed):
     return met, n, N
 
 
-# ----------------------------- tablo + figür -----------------------------
+# ----------------------------- table + figure -----------------------------
 def tablo(tum):
     K = S.KOLON8
     rows = []
