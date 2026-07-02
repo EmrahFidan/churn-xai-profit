@@ -36,7 +36,6 @@ EKSEN = {
     "musteri_sayisi": "Müşteri sayısı",
     "churn_durumu": "Churn durumu",
     "deger": "Değer",
-    "yogunluk": "Yoğunluk",
     "churn_orani": "Churn oranı",
     "eksik_sayisi": "Eksik hücre sayısı",
     "kategori": "Kategori",
@@ -156,9 +155,6 @@ ROL = {
 }
 MSG2 = {
     "hpo": "{set} / {model}: HPO bitti (en iyi PR-AUC={skor:.4f})",
-    "deg": "{set} / {model}: 5-kat değerlendirme + kalibrasyon bitti",
-    "kazanan": "{set}: en iyi model {model} (PR-AUC={skor})",
-    "kalib_kazanan": "{set} / {model}: kalibrasyon kazananı {yontem} (ECE={ece})",
     "iranian_status": "iranian: 'Status' çıkarılınca PR-AUC {oncesi} -> {sonrasi} (fark {fark:+.4f}) [{model}]",
     "bitti": "ADIM 2 tamamlandı. Model ailesi ve kalibrasyon seçimi kullanıcıya bırakıldı. Dengeleme (RQ1) yapılmadı.",
 }
@@ -313,7 +309,6 @@ FIG6_BASLIK = {
 EKSEN6 = {
     "prauc": "PR-AUC",
     "oran": "Koruma oranı (transfer / referans)",
-    "senaryo": "Senaryo",
 }
 KOLON6 = {
     "senaryo": "Senaryo",
@@ -369,7 +364,6 @@ FIG7_BASLIK = {
 EKSEN7 = {
     "kar": "Toplam kâr (CLV birimi)",
     "prauc": "PR-AUC",
-    "set": "Veri seti",
 }
 KOLON7 = {
     "veri_seti": "Veri Seti",
@@ -397,7 +391,6 @@ ANLAMLI = {True: "anlamlı (p<0.05)", False: "gürültü (p≥0.05)"}
 MSG7 = {
     "ablation": "{set} / {kosul}: kâr={kar:.0f} ROI={roi:.2f} ECE={ece:.3f} t*={esik:.2f} | Δvs K0={dkar:+.0f} ({yuzde:+.1f}%)",
     "ci": "{set} {metrik}: {ort:.4f} ± {std:.4f}  [%95 CI {lo:.4f}, {hi:.4f}]",
-    "sig": "{kiyas}: {test} istatistik={ist:.1f} p={p:.4f} -> {sonuc}",
     "yontem": "Anlamlılık yöntemi: eşli skorlar (set×seed OOF PR-AUC, n={n}) üstünde Wilcoxon signed-rank.",
     "bitti": "ADIM 7 (sağlamlık) tamamlandı. Deney fazı bitti; yorum/karar kullanıcıya bırakıldı, sırada yazım.",
 }

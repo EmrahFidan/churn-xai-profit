@@ -32,7 +32,6 @@ EKSEN = {
     "musteri_sayisi": "Number of customers",
     "churn_durumu": "Churn status",
     "deger": "Value",
-    "yogunluk": "Density",
     "churn_orani": "Churn rate",
     "eksik_sayisi": "Missing cell count",
     "kategori": "Category",
@@ -147,9 +146,6 @@ ROL = {
 }
 MSG2 = {
     "hpo": "{set} / {model}: HPO done (best PR-AUC={skor:.4f})",
-    "deg": "{set} / {model}: 5-fold evaluation + calibration done",
-    "kazanan": "{set}: best model {model} (PR-AUC={skor})",
-    "kalib_kazanan": "{set} / {model}: calibration winner {yontem} (ECE={ece})",
     "iranian_status": "iranian: removing 'Status' -> PR-AUC {oncesi} -> {sonrasi} (diff {fark:+.4f}) [{model}]",
     "bitti": "STEP 2 complete. Model family and calibration choice left to the user. No resampling (RQ1) performed.",
 }
@@ -304,7 +300,6 @@ FIG6_BASLIK = {
 EKSEN6 = {
     "prauc": "PR-AUC",
     "oran": "Retention ratio (transfer / reference)",
-    "senaryo": "Scenario",
 }
 KOLON6 = {
     "senaryo": "Scenario",
@@ -360,7 +355,6 @@ FIG7_BASLIK = {
 EKSEN7 = {
     "kar": "Total profit (CLV units)",
     "prauc": "PR-AUC",
-    "set": "Dataset",
 }
 KOLON7 = {
     "veri_seti": "Dataset",
@@ -388,7 +382,6 @@ ANLAMLI = {True: "significant (p<0.05)", False: "noise (p≥0.05)"}
 MSG7 = {
     "ablation": "{set} / {kosul}: profit={kar:.0f} ROI={roi:.2f} ECE={ece:.3f} t*={esik:.2f} | Δvs K0={dkar:+.0f} ({yuzde:+.1f}%)",
     "ci": "{set} {metrik}: {ort:.4f} ± {std:.4f}  [95% CI {lo:.4f}, {hi:.4f}]",
-    "sig": "{kiyas}: {test} statistic={ist:.1f} p={p:.4f} -> {sonuc}",
     "yontem": "Significance method: Wilcoxon signed-rank over paired scores (dataset×seed OOF PR-AUC, n={n}).",
     "bitti": "STEP 7 (robustness) complete. Experimental phase done; interpretation left to the user, write-up next.",
 }

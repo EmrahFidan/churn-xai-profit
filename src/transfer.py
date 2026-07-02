@@ -22,6 +22,7 @@ from sklearn.preprocessing import StandardScaler
 
 from . import concept_map as km
 from . import config as cfg
+from . import plotstyle as ps
 from . import evaluate as ev
 from . import strings as S
 
@@ -218,7 +219,6 @@ def _kaydet(fig, dosya):
 
 
 def figur_prauc(sonuclar):
-    from . import plotstyle as ps
     etk = [r["anahtar"] for r in sonuclar]
     x = np.arange(len(sonuclar))
     w = 0.26
@@ -240,7 +240,6 @@ def figur_prauc(sonuclar):
 
 
 def figur_retention(sonuclar):
-    from . import plotstyle as ps
     etk = [r["anahtar"] for r in sonuclar]
     oran = [r["oran"] for r in sonuclar]
     renk = [ps.KOSUL_RENK["smote"] if r["tip"] == "intra-sector" else ps.KOSUL_RENK["adasyn"] for r in sonuclar]
@@ -259,7 +258,6 @@ def figur_retention(sonuclar):
 
 def figur_semantic_vs_importance(onem_sonuclar, semantik_sonuclar):
     """A1/A2: semantic vs importance-based retention ratio (threshold band + trivial/ref marker)."""
-    from . import plotstyle as ps
     anahtarlar = [r["anahtar"] for r in semantik_sonuclar]
     onem = {r["anahtar"]: r for r in onem_sonuclar}
     x = np.arange(len(anahtarlar))

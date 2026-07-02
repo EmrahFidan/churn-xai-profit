@@ -143,16 +143,6 @@ def calistir_set_rq1(set_adi, df, seed):
 
 
 # ----------------------------- tables -----------------------------
-def _ort(x):
-    a = np.asarray(x, float)
-    return a.mean(), a.std()
-
-
-def _fmt(x):
-    m, s = _ort(x)
-    return f"{m:.4f} ± {s:.4f}"
-
-
 def tablo_karsilastirma(tum):
     """rq1_imbalance_comparison.csv (set × method, mean ± std)."""
     K = S.KOLON3
@@ -162,10 +152,10 @@ def tablo_karsilastirma(tum):
             pf = res[k]["perfold"]
             rows.append({
                 K["veri_seti"]: s, K["yontem"]: S.KOSUL_AD[k],
-                K["pr_auc"]: _fmt(pf["PR-AUC"]), K["roc_auc"]: _fmt(pf["ROC-AUC"]),
-                K["recall"]: _fmt(pf["recall"]), K["precision"]: _fmt(pf["precision"]),
-                K["f1"]: _fmt(pf["F1"]), K["ece"]: _fmt(pf["ECE"]), K["brier"]: _fmt(pf["Brier"]),
-                K["esik"]: _fmt(pf["esik"]),
+                K["pr_auc"]: ev._fmt(pf["PR-AUC"]), K["roc_auc"]: ev._fmt(pf["ROC-AUC"]),
+                K["recall"]: ev._fmt(pf["recall"]), K["precision"]: ev._fmt(pf["precision"]),
+                K["f1"]: ev._fmt(pf["F1"]), K["ece"]: ev._fmt(pf["ECE"]), K["brier"]: ev._fmt(pf["Brier"]),
+                K["esik"]: ev._fmt(pf["esik"]),
             })
     df = pd.DataFrame(rows)
     df.to_csv(cfg.TABLES / "rq1_imbalance_comparison.csv", index=False)
@@ -179,7 +169,7 @@ def tablo_esikler(tum):
     for s, res in tum.items():
         for k in KOSULLAR:
             rows.append({K["veri_seti"]: s, K["yontem"]: S.KOSUL_AD[k],
-                         K["esik"]: _fmt(res[k]["perfold"]["esik"])})
+                         K["esik"]: ev._fmt(res[k]["perfold"]["esik"])})
     df = pd.DataFrame(rows)
     df.to_csv(cfg.TABLES / "rq1_thresholds.csv", index=False)
     return df

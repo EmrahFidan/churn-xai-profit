@@ -12,7 +12,6 @@ from . import strings as S
 
 # two fixed colors for churn (same across all figures)
 CHURN_RENK = {0: "#4C72B0", 1: "#C44E52"}
-PALET = [CHURN_RENK[0], CHURN_RENK[1]]
 
 # fixed colors for models (curve/bar figures)
 MODEL_RENK = {
@@ -53,11 +52,6 @@ def uygula():
         "figure.facecolor": "white",
     })
 
-
-def churn_legend(ax):
-    """Adds a legend to the figure with fixed churn colors/labels."""
-    el = [mpl.patches.Patch(color=CHURN_RENK[k], label=S.CHURN_ETIKET[k]) for k in (0, 1)]
-    ax.legend(handles=el, title="Churn")
 
 
 def kaydet(fig, set_adi: str, anahtar: str):

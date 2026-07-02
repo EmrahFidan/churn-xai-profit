@@ -44,38 +44,17 @@ class HamHazirla(BaseEstimator, TransformerMixin):
         return X
 
 
-def _ornek_kolonlar(set_adi, feats):
-    """Determines post-preprocessing column names/roles (structural metadata, not leakage)."""
-    if set_adi == "cell2cell":
-        ornek = HamHazirla().fit_transform(feats)
-    else:
-        ornek = feats
-    num = [c for c in ornek.columns if is_numeric_dtype(ornek[c])]
-    nom = [c for c in ornek.columns if not is_numeric_dtype(ornek[c])]
-    return num, nom
-
-
 def on_isleyici(set_adi: str, df: pd.DataFrame, olcekle: bool):
-    """Returns a preprocessor Pipeline based on dataset + model type (not fit).
+    """Preprocessor pipeline for a dataset/model type (thin wrapper over parcalar).
 
     olcekle=True (LogReg) -> StandardScaler on numerics; False for tree models.
-    Returns: (pipeline, sema) — sema={sayisal, nominal, ozel}.
+    Returns: (pipeline, sema) where sema={sayisal, nominal, ozel}.
     """
-    feats = df.drop(columns=["churn"])
-    ozel = set_adi == "cell2cell"
-    num, nom = _ornek_kolonlar(set_adi, feats)
-
-    num_tf = StandardScaler() if olcekle else "passthrough"
-    transformers = [("num", num_tf, num)]
-    if nom:
-        transformers.append(("nom", OneHotEncoder(handle_unknown="ignore", sparse_output=False), nom))
-    ct = ColumnTransformer(transformers, remainder="drop")
-
-    steps = []
-    if ozel:
-        steps.append(("hazirla", HamHazirla()))
-    steps.append(("ct", ct))
-    return Pipeline(steps), {"sayisal": num, "nominal": nom, "ozel": ozel}
+    parts = parcalar(set_adi, df, olcekle)
+    steps = ([("hazirla", parts["prep"])] if parts["prep"] is not None else [])
+    steps.append(("ct", parts["ct"]))
+    return Pipeline(steps), {"sayisal": parts["sayisal"], "nominal": parts["nominal"],
+                             "ozel": parts["prep"] is not None}
 
 
 def parcalar(set_adi: str, df: pd.DataFrame, olcekle: bool = False):
