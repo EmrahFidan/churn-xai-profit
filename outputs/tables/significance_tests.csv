@@ -1,0 +1,7 @@
+Comparison,Test,Statistic,p-value,Result
+lgbm vs logreg (PR-AUC),Wilcoxon,0.0,0.0,significant (p<0.05)
+lgbm vs xgboost (PR-AUC),Wilcoxon,117.0,0.23036,noise (p≥0.05)
+logreg vs xgboost (PR-AUC),Wilcoxon,0.0,0.0,significant (p<0.05)
+Profit threshold (K0) vs accuracy (K1) — profit,Wilcoxon,0.0,0.00195,significant (p<0.05)
+"ours vs ProfLogit (EMPC, pooled 25 folds)",Wilcoxon,63.0,0.01293,significant (p<0.05)
+"ours vs ProfLogit (profit, pooled 25 folds)",Wilcoxon,94.0,0.1096,noise (p≥0.05)
