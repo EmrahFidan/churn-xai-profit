@@ -1,0 +1,13 @@
+Case,Churn probability,Feature,Raw value,SHAP contribution
+high-risk,0.947,NumOfProducts,3,2.3212
+high-risk,0.947,Age,56,1.7253
+high-risk,0.947,IsActiveMember,0,0.3909
+high-risk,0.947,Balance,115895.22,0.2631
+high-risk,0.947,Gender = Female,Female,0.1309
+high-risk,0.947,Geography = Germany,France,-0.0598
+low-risk,0.0192,NumOfProducts,2,-0.7607
+low-risk,0.0192,Age,29,-0.6068
+low-risk,0.0192,IsActiveMember,1,-0.188
+low-risk,0.0192,Balance,0.0,-0.1879
+low-risk,0.0192,Gender = Female,Male,-0.1859
+low-risk,0.0192,CreditScore,654,-0.0322

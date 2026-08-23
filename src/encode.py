@@ -7,6 +7,9 @@ cell2cell-specific (locked decisions):
 - HandsetPrice: string -> numeric, 'Unknown'/unparseable -> NaN -> train median;
   additionally a handsetprice_unknown 0/1 flag is added.
 - ServiceArea: most frequent 15 categories + 'Other', then one-hot.
+
+Missing values are imputed inside the fold by MissingValueImputer, which is placed
+before any resampling step so that the resampler never sees missing cells.
 """
 import pandas as pd
 from pandas.api.types import is_numeric_dtype
@@ -17,6 +20,32 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 from . import config as cfg
 from . import strings as S
+
+
+class MissingValueImputer(BaseEstimator, TransformerMixin):
+    """Median / most-frequent imputation fit on the within-fold training data.
+
+    Numeric columns are filled with the training median, categorical columns with the
+    training mode ('Unknown' when a column is empty). Column names and order are kept
+    unchanged so that the categorical indices used by SMOTENC stay valid.
+    """
+
+    def fit(self, X, y=None):
+        self.istatistikler_ = {}
+        for c in X.columns:
+            if is_numeric_dtype(X[c]):
+                self.istatistikler_[c] = float(X[c].median())
+            else:
+                mod = X[c].mode(dropna=True)
+                self.istatistikler_[c] = mod.iloc[0] if len(mod) else 'Unknown'
+        return self
+
+    def transform(self, X):
+        X = X.copy()
+        for c, deger in self.istatistikler_.items():
+            if c in X.columns:
+                X[c] = X[c].fillna(deger)
+        return X
 
 
 class HamHazirla(BaseEstimator, TransformerMixin):
@@ -52,6 +81,7 @@ def on_isleyici(set_adi: str, df: pd.DataFrame, olcekle: bool):
     """
     parts = parcalar(set_adi, df, olcekle)
     steps = ([("hazirla", parts["prep"])] if parts["prep"] is not None else [])
+    steps.append(("doldur", parts["impute"]))
     steps.append(("ct", parts["ct"]))
     return Pipeline(steps), {"sayisal": parts["sayisal"], "nominal": parts["nominal"],
                              "ozel": parts["prep"] is not None}
@@ -60,7 +90,7 @@ def on_isleyici(set_adi: str, df: pd.DataFrame, olcekle: bool):
 def parcalar(set_adi: str, df: pd.DataFrame, olcekle: bool = False):
     """Returns the preprocessing pieces SEPARATELY (to place the resampler between prep and encode).
 
-    Returns: {prep, ct, sayisal, nominal, kolonlar, kat_idx}. `prep` is HamHazirla
+    Returns: {prep, impute, ct, sayisal, nominal, kolonlar, kat_idx}. `prep` is HamHazirla
     for cell2cell, None otherwise. `kat_idx` are the categorical column indices for
     the resampler (SMOTENC), following the post-preprocessing column order. `ct` is
     encode only (excluding prep).
@@ -80,8 +110,8 @@ def parcalar(set_adi: str, df: pd.DataFrame, olcekle: bool = False):
 
     kolonlar = list(ornek.columns)
     kat_idx = [kolonlar.index(c) for c in nom]
-    return {"prep": prep, "ct": ct, "sayisal": num, "nominal": nom,
-            "kolonlar": kolonlar, "kat_idx": kat_idx}
+    return {"prep": prep, "impute": MissingValueImputer(), "ct": ct,
+            "sayisal": num, "nominal": nom, "kolonlar": kolonlar, "kat_idx": kat_idx}
 
 
 def sema_yaz(set_adi: str, sema: dict):

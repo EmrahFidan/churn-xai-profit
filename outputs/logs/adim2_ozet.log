@@ -1,0 +1,183 @@
+telco       (7043, 20)  churn=%26.5
+cell2cell   (51047, 57)  churn=%28.8
+ecommerce   (3941, 11)  churn=%17.1
+iranian     (3150, 14)  churn=%15.7
+bank        (10000, 11)  churn=%20.4
+===== MODELING + CALIBRATION =====
+telco / Logistic Regression: HPO done (best PR-AUC=0.6569)
+telco / Random Forest: HPO done (best PR-AUC=0.6627)
+telco / XGBoost: HPO done (best PR-AUC=0.6648)
+telco / LightGBM: HPO done (best PR-AUC=0.6635)
+telco / CatBoost: HPO done (best PR-AUC=0.6696)
+telco / Explainable Boosting Machine: HPO done (best PR-AUC=0.6704)
+  -> telco done (298s)
+cell2cell / Logistic Regression: HPO done (best PR-AUC=0.3840)
+cell2cell / Random Forest: HPO done (best PR-AUC=0.4507)
+cell2cell / XGBoost: HPO done (best PR-AUC=0.4671)
+cell2cell / LightGBM: HPO done (best PR-AUC=0.4663)
+cell2cell / CatBoost: HPO done (best PR-AUC=0.4648)
+cell2cell / Explainable Boosting Machine: HPO done (best PR-AUC=0.4412)
+  -> cell2cell done (7458s)
+ecommerce / Logistic Regression: HPO done (best PR-AUC=0.6853)
+ecommerce / Random Forest: HPO done (best PR-AUC=0.8912)
+ecommerce / XGBoost: HPO done (best PR-AUC=0.8923)
+ecommerce / LightGBM: HPO done (best PR-AUC=0.9084)
+ecommerce / CatBoost: HPO done (best PR-AUC=0.9111)
+ecommerce / Explainable Boosting Machine: HPO done (best PR-AUC=0.7634)
+  -> ecommerce done (217s)
+iranian / Logistic Regression: HPO done (best PR-AUC=0.7628)
+iranian / Random Forest: HPO done (best PR-AUC=0.9349)
+iranian / XGBoost: HPO done (best PR-AUC=0.9522)
+iranian / LightGBM: HPO done (best PR-AUC=0.9576)
+iranian / CatBoost: HPO done (best PR-AUC=0.9571)
+iranian / Explainable Boosting Machine: HPO done (best PR-AUC=0.8897)
+  -> iranian done (223s)
+bank / Logistic Regression: HPO done (best PR-AUC=0.4717)
+bank / Random Forest: HPO done (best PR-AUC=0.7013)
+bank / XGBoost: HPO done (best PR-AUC=0.7100)
+bank / LightGBM: HPO done (best PR-AUC=0.7065)
+bank / CatBoost: HPO done (best PR-AUC=0.7173)
+bank / Explainable Boosting Machine: HPO done (best PR-AUC=0.6805)
+  -> bank done (273s)
+===== MODEL PERFORMANCE (fold avg ± std) =====
+  Dataset                        Model          PR-AUC         ROC-AUC          Recall       Precision              F1
+    telco          Logistic Regression 0.6569 ± 0.0261 0.8452 ± 0.0133 0.5527 ± 0.0305 0.6588 ± 0.0203 0.6010 ± 0.0262
+    telco                Random Forest 0.6627 ± 0.0269 0.8472 ± 0.0114 0.5099 ± 0.0267 0.6676 ± 0.0174 0.5780 ± 0.0224
+    telco                      XGBoost 0.6648 ± 0.0239 0.8473 ± 0.0118 0.5254 ± 0.0216 0.6643 ± 0.0154 0.5866 ± 0.0184
+    telco                     LightGBM 0.6635 ± 0.0223 0.8469 ± 0.0108 0.5179 ± 0.0353 0.6661 ± 0.0241 0.5825 ± 0.0303
+    telco                     CatBoost 0.6696 ± 0.0194 0.8491 ± 0.0104 0.5249 ± 0.0184 0.6755 ± 0.0198 0.5907 ± 0.0188
+    telco Explainable Boosting Machine 0.6704 ± 0.0174 0.8500 ± 0.0101 0.5436 ± 0.0249 0.6631 ± 0.0181 0.5973 ± 0.0206
+cell2cell          Logistic Regression 0.3840 ± 0.0062 0.6204 ± 0.0049 0.0310 ± 0.0014 0.4921 ± 0.0314 0.0583 ± 0.0025
+cell2cell                Random Forest 0.4507 ± 0.0091 0.6744 ± 0.0064 0.0776 ± 0.0022 0.6105 ± 0.0320 0.1376 ± 0.0039
+cell2cell                      XGBoost 0.4671 ± 0.0050 0.6835 ± 0.0032 0.1699 ± 0.0046 0.5786 ± 0.0077 0.2626 ± 0.0049
+cell2cell                     LightGBM 0.4663 ± 0.0068 0.6842 ± 0.0044 0.1394 ± 0.0041 0.5964 ± 0.0173 0.2260 ± 0.0058
+cell2cell                     CatBoost 0.4648 ± 0.0062 0.6830 ± 0.0047 0.1422 ± 0.0051 0.5957 ± 0.0155 0.2296 ± 0.0075
+cell2cell Explainable Boosting Machine 0.4412 ± 0.0067 0.6695 ± 0.0041 0.1057 ± 0.0054 0.5627 ± 0.0214 0.1778 ± 0.0073
+ecommerce          Logistic Regression 0.6853 ± 0.0251 0.8842 ± 0.0120 0.4733 ± 0.0287 0.7138 ± 0.0304 0.5689 ± 0.0279
+ecommerce                Random Forest 0.8912 ± 0.0314 0.9664 ± 0.0096 0.7938 ± 0.0459 0.8652 ± 0.0354 0.8278 ± 0.0405
+ecommerce                      XGBoost 0.8923 ± 0.0288 0.9662 ± 0.0088 0.8116 ± 0.0470 0.8682 ± 0.0242 0.8384 ± 0.0327
+ecommerce                     LightGBM 0.9084 ± 0.0162 0.9664 ± 0.0072 0.8161 ± 0.0317 0.8812 ± 0.0141 0.8472 ± 0.0224
+ecommerce                     CatBoost 0.9111 ± 0.0232 0.9721 ± 0.0091 0.8161 ± 0.0512 0.8820 ± 0.0331 0.8476 ± 0.0428
+ecommerce Explainable Boosting Machine 0.7634 ± 0.0398 0.9156 ± 0.0127 0.6084 ± 0.0651 0.7772 ± 0.0319 0.6812 ± 0.0498
+  iranian          Logistic Regression 0.7628 ± 0.0178 0.9341 ± 0.0076 0.4485 ± 0.0187 0.7645 ± 0.0442 0.5641 ± 0.0081
+  iranian                Random Forest 0.9349 ± 0.0096 0.9851 ± 0.0037 0.8263 ± 0.0334 0.8889 ± 0.0138 0.8563 ± 0.0233
+  iranian                      XGBoost 0.9522 ± 0.0078 0.9882 ± 0.0028 0.8444 ± 0.0317 0.8843 ± 0.0192 0.8634 ± 0.0164
+  iranian                     LightGBM 0.9576 ± 0.0115 0.9896 ± 0.0029 0.8505 ± 0.0251 0.8927 ± 0.0244 0.8707 ± 0.0169
+  iranian                     CatBoost 0.9571 ± 0.0057 0.9896 ± 0.0024 0.8485 ± 0.0332 0.9093 ± 0.0082 0.8774 ± 0.0167
+  iranian Explainable Boosting Machine 0.8897 ± 0.0127 0.9717 ± 0.0043 0.7677 ± 0.0313 0.8303 ± 0.0132 0.7972 ± 0.0138
+     bank          Logistic Regression 0.4717 ± 0.0273 0.7661 ± 0.0146 0.2116 ± 0.0113 0.5993 ± 0.0374 0.3127 ± 0.0169
+     bank                Random Forest 0.7013 ± 0.0170 0.8646 ± 0.0061 0.4477 ± 0.0188 0.7883 ± 0.0251 0.5705 ± 0.0131
+     bank                      XGBoost 0.7100 ± 0.0159 0.8683 ± 0.0068 0.4850 ± 0.0282 0.7684 ± 0.0238 0.5943 ± 0.0253
+     bank                     LightGBM 0.7065 ± 0.0150 0.8667 ± 0.0061 0.4806 ± 0.0204 0.7605 ± 0.0188 0.5887 ± 0.0171
+     bank                     CatBoost 0.7173 ± 0.0161 0.8726 ± 0.0072 0.4742 ± 0.0258 0.7734 ± 0.0165 0.5874 ± 0.0195
+     bank Explainable Boosting Machine 0.6805 ± 0.0181 0.8521 ± 0.0090 0.4536 ± 0.0249 0.7485 ± 0.0192 0.5643 ± 0.0180
+===== CALIBRATION COMPARISON =====
+  Dataset                        Model             Method           Brier             ECE
+    telco          Logistic Regression Raw (uncalibrated) 0.1355 ± 0.0055 0.0214 ± 0.0026
+    telco          Logistic Regression    Platt (sigmoid) 0.1356 ± 0.0054 0.0215 ± 0.0012
+    telco          Logistic Regression           Isotonic 0.1355 ± 0.0055 0.0196 ± 0.0033
+    telco                Random Forest Raw (uncalibrated) 0.1344 ± 0.0047 0.0251 ± 0.0032
+    telco                Random Forest    Platt (sigmoid) 0.1354 ± 0.0051 0.0375 ± 0.0072
+    telco                Random Forest           Isotonic 0.1346 ± 0.0049 0.0243 ± 0.0067
+    telco                      XGBoost Raw (uncalibrated) 0.1344 ± 0.0048 0.0239 ± 0.0034
+    telco                      XGBoost    Platt (sigmoid) 0.1354 ± 0.0050 0.0358 ± 0.0050
+    telco                      XGBoost           Isotonic 0.1344 ± 0.0049 0.0249 ± 0.0055
+    telco                     LightGBM Raw (uncalibrated) 0.1345 ± 0.0045 0.0224 ± 0.0077
+    telco                     LightGBM    Platt (sigmoid) 0.1339 ± 0.0043 0.0229 ± 0.0037
+    telco                     LightGBM           Isotonic 0.1341 ± 0.0043 0.0230 ± 0.0095
+    telco                     CatBoost Raw (uncalibrated) 0.1335 ± 0.0043 0.0252 ± 0.0048
+    telco                     CatBoost    Platt (sigmoid) 0.1350 ± 0.0047 0.0419 ± 0.0072
+    telco                     CatBoost           Isotonic 0.1337 ± 0.0044 0.0223 ± 0.0066
+    telco Explainable Boosting Machine Raw (uncalibrated) 0.1333 ± 0.0042 0.0202 ± 0.0031
+    telco Explainable Boosting Machine    Platt (sigmoid) 0.1336 ± 0.0040 0.0191 ± 0.0042
+    telco Explainable Boosting Machine           Isotonic 0.1336 ± 0.0040 0.0222 ± 0.0031
+cell2cell          Logistic Regression Raw (uncalibrated) 0.1980 ± 0.0008 0.0082 ± 0.0021
+cell2cell          Logistic Regression    Platt (sigmoid) 0.1980 ± 0.0007 0.0138 ± 0.0023
+cell2cell          Logistic Regression           Isotonic 0.1977 ± 0.0007 0.0055 ± 0.0019
+cell2cell                Random Forest Raw (uncalibrated) 0.1890 ± 0.0010 0.0133 ± 0.0031
+cell2cell                Random Forest    Platt (sigmoid) 0.1917 ± 0.0007 0.0330 ± 0.0041
+cell2cell                Random Forest           Isotonic 0.1904 ± 0.0008 0.0171 ± 0.0056
+cell2cell                      XGBoost Raw (uncalibrated) 0.1868 ± 0.0006 0.0104 ± 0.0035
+cell2cell                      XGBoost    Platt (sigmoid) 0.1900 ± 0.0008 0.0339 ± 0.0016
+cell2cell                      XGBoost           Isotonic 0.1893 ± 0.0008 0.0270 ± 0.0030
+cell2cell                     LightGBM Raw (uncalibrated) 0.1868 ± 0.0009 0.0080 ± 0.0017
+cell2cell                     LightGBM    Platt (sigmoid) 0.1910 ± 0.0009 0.0388 ± 0.0041
+cell2cell                     LightGBM           Isotonic 0.1890 ± 0.0008 0.0268 ± 0.0040
+cell2cell                     CatBoost Raw (uncalibrated) 0.1870 ± 0.0009 0.0093 ± 0.0021
+cell2cell                     CatBoost    Platt (sigmoid) 0.1906 ± 0.0008 0.0368 ± 0.0034
+cell2cell                     CatBoost           Isotonic 0.1895 ± 0.0008 0.0281 ± 0.0032
+cell2cell Explainable Boosting Machine Raw (uncalibrated) 0.1901 ± 0.0008 0.0086 ± 0.0013
+cell2cell Explainable Boosting Machine    Platt (sigmoid) 0.1930 ± 0.0008 0.0323 ± 0.0039
+cell2cell Explainable Boosting Machine           Isotonic 0.1915 ± 0.0006 0.0246 ± 0.0070
+ecommerce          Logistic Regression Raw (uncalibrated) 0.0875 ± 0.0035 0.0284 ± 0.0073
+ecommerce          Logistic Regression    Platt (sigmoid) 0.0876 ± 0.0033 0.0274 ± 0.0072
+ecommerce          Logistic Regression           Isotonic 0.0872 ± 0.0045 0.0222 ± 0.0071
+ecommerce                Random Forest Raw (uncalibrated) 0.0453 ± 0.0058 0.0397 ± 0.0136
+ecommerce                Random Forest    Platt (sigmoid) 0.0492 ± 0.0069 0.0352 ± 0.0102
+ecommerce                Random Forest           Isotonic 0.0494 ± 0.0059 0.0307 ± 0.0132
+ecommerce                      XGBoost Raw (uncalibrated) 0.0426 ± 0.0070 0.0244 ± 0.0083
+ecommerce                      XGBoost    Platt (sigmoid) 0.0496 ± 0.0074 0.0444 ± 0.0081
+ecommerce                      XGBoost           Isotonic 0.0492 ± 0.0067 0.0368 ± 0.0116
+ecommerce                     LightGBM Raw (uncalibrated) 0.0435 ± 0.0063 0.0379 ± 0.0059
+ecommerce                     LightGBM    Platt (sigmoid) 0.0488 ± 0.0050 0.0417 ± 0.0113
+ecommerce                     LightGBM           Isotonic 0.0474 ± 0.0053 0.0349 ± 0.0096
+ecommerce                     CatBoost Raw (uncalibrated) 0.0390 ± 0.0090 0.0234 ± 0.0073
+ecommerce                     CatBoost    Platt (sigmoid) 0.0471 ± 0.0072 0.0438 ± 0.0098
+ecommerce                     CatBoost           Isotonic 0.0459 ± 0.0068 0.0344 ± 0.0148
+ecommerce Explainable Boosting Machine Raw (uncalibrated) 0.0742 ± 0.0061 0.0285 ± 0.0078
+ecommerce Explainable Boosting Machine    Platt (sigmoid) 0.0746 ± 0.0058 0.0265 ± 0.0076
+ecommerce Explainable Boosting Machine           Isotonic 0.0742 ± 0.0065 0.0251 ± 0.0018
+  iranian          Logistic Regression Raw (uncalibrated) 0.0692 ± 0.0036 0.0284 ± 0.0063
+  iranian          Logistic Regression    Platt (sigmoid) 0.0695 ± 0.0034 0.0255 ± 0.0066
+  iranian          Logistic Regression           Isotonic 0.0686 ± 0.0040 0.0202 ± 0.0051
+  iranian                Random Forest Raw (uncalibrated) 0.0340 ± 0.0030 0.0273 ± 0.0067
+  iranian                Random Forest    Platt (sigmoid) 0.0360 ± 0.0037 0.0235 ± 0.0057
+  iranian                Random Forest           Isotonic 0.0357 ± 0.0032 0.0194 ± 0.0018
+  iranian                      XGBoost Raw (uncalibrated) 0.0289 ± 0.0034 0.0184 ± 0.0028
+  iranian                      XGBoost    Platt (sigmoid) 0.0322 ± 0.0045 0.0324 ± 0.0020
+  iranian                      XGBoost           Isotonic 0.0309 ± 0.0039 0.0210 ± 0.0050
+  iranian                     LightGBM Raw (uncalibrated) 0.0275 ± 0.0040 0.0176 ± 0.0056
+  iranian                     LightGBM    Platt (sigmoid) 0.0287 ± 0.0037 0.0262 ± 0.0026
+  iranian                     LightGBM           Isotonic 0.0294 ± 0.0042 0.0231 ± 0.0046
+  iranian                     CatBoost Raw (uncalibrated) 0.0266 ± 0.0022 0.0204 ± 0.0042
+  iranian                     CatBoost    Platt (sigmoid) 0.0290 ± 0.0039 0.0291 ± 0.0042
+  iranian                     CatBoost           Isotonic 0.0283 ± 0.0027 0.0203 ± 0.0065
+  iranian Explainable Boosting Machine Raw (uncalibrated) 0.0455 ± 0.0025 0.0211 ± 0.0039
+  iranian Explainable Boosting Machine    Platt (sigmoid) 0.0475 ± 0.0025 0.0349 ± 0.0062
+  iranian Explainable Boosting Machine           Isotonic 0.0458 ± 0.0025 0.0318 ± 0.0061
+     bank          Logistic Regression Raw (uncalibrated) 0.1359 ± 0.0033 0.0175 ± 0.0031
+     bank          Logistic Regression    Platt (sigmoid) 0.1360 ± 0.0032 0.0184 ± 0.0035
+     bank          Logistic Regression           Isotonic 0.1360 ± 0.0035 0.0178 ± 0.0064
+     bank                Random Forest Raw (uncalibrated) 0.1021 ± 0.0026 0.0222 ± 0.0029
+     bank                Random Forest    Platt (sigmoid) 0.1029 ± 0.0030 0.0309 ± 0.0060
+     bank                Random Forest           Isotonic 0.1020 ± 0.0026 0.0152 ± 0.0057
+     bank                      XGBoost Raw (uncalibrated) 0.1007 ± 0.0027 0.0197 ± 0.0049
+     bank                      XGBoost    Platt (sigmoid) 0.1021 ± 0.0030 0.0370 ± 0.0052
+     bank                      XGBoost           Isotonic 0.1011 ± 0.0028 0.0222 ± 0.0068
+     bank                     LightGBM Raw (uncalibrated) 0.1016 ± 0.0026 0.0202 ± 0.0035
+     bank                     LightGBM    Platt (sigmoid) 0.1016 ± 0.0027 0.0201 ± 0.0033
+     bank                     LightGBM           Isotonic 0.1017 ± 0.0027 0.0194 ± 0.0074
+     bank                     CatBoost Raw (uncalibrated) 0.0993 ± 0.0029 0.0177 ± 0.0042
+     bank                     CatBoost    Platt (sigmoid) 0.1007 ± 0.0033 0.0316 ± 0.0039
+     bank                     CatBoost           Isotonic 0.0995 ± 0.0028 0.0153 ± 0.0052
+     bank Explainable Boosting Machine Raw (uncalibrated) 0.1064 ± 0.0030 0.0228 ± 0.0065
+     bank Explainable Boosting Machine    Platt (sigmoid) 0.1063 ± 0.0029 0.0215 ± 0.0060
+     bank Explainable Boosting Machine           Isotonic 0.1064 ± 0.0028 0.0210 ± 0.0067
+Saved: /Users/emrahfidan/Desktop/makale-2/outputs/tables/model_performance.csv
+Saved: /Users/emrahfidan/Desktop/makale-2/outputs/tables/calibration_comparison.csv
+===== FIGURES =====
+telco: 4 figures -> /Users/emrahfidan/Desktop/makale-2/outputs/figures/telco (calibration figure: Explainable Boosting Machine)
+cell2cell: 4 figures -> /Users/emrahfidan/Desktop/makale-2/outputs/figures/cell2cell (calibration figure: XGBoost)
+ecommerce: 4 figures -> /Users/emrahfidan/Desktop/makale-2/outputs/figures/ecommerce (calibration figure: CatBoost)
+iranian: 4 figures -> /Users/emrahfidan/Desktop/makale-2/outputs/figures/iranian (calibration figure: LightGBM)
+bank: 4 figures -> /Users/emrahfidan/Desktop/makale-2/outputs/figures/bank (calibration figure: CatBoost)
+===== iranian 'Status' EFFECT =====
+iranian: removing 'Status' -> PR-AUC 0.9557 -> 0.9435 (diff -0.0122) [LightGBM]
+===== SUMMARY — WINNERS (decision left to the user) =====
+  Dataset                  Best model (PR-AUC)     Best calibration (ECE)
+    telco Explainable Boosting Machine (0.670)    Platt (sigmoid) (0.019)
+cell2cell                      XGBoost (0.467) Raw (uncalibrated) (0.010)
+ecommerce                     CatBoost (0.911) Raw (uncalibrated) (0.023)
+  iranian                     LightGBM (0.958) Raw (uncalibrated) (0.018)
+     bank                     CatBoost (0.717)           Isotonic (0.015)
+STEP 2 complete. Model family and calibration choice left to the user. No resampling (RQ1) performed.

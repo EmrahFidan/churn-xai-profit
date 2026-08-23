@@ -1,16 +1,20 @@
 """Model definitions + lightweight hyperparameter optimization (no GPU).
 
-From simple to strong: Logistic Regression, Random Forest, XGBoost, LightGBM.
+From simple to strong: Logistic Regression, Random Forest, XGBoost, LightGBM, CatBoost.
+An Explainable Boosting Machine (glass-box GAM) is included as an interpretable
+reference point rather than as a competitor for the carrier model.
 HPO: RandomizedSearchCV, 5-fold, scoring=average_precision (PR-AUC; imbalanced data).
 No excessive tuning. Models n_jobs=1; parallelism at the search layer.
 """
+from catboost import CatBoostClassifier
+from interpret.glassbox import ExplainableBoostingClassifier
 from lightgbm import LGBMClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import RandomizedSearchCV, StratifiedKFold
 from xgboost import XGBClassifier
 
-MODEL_ADLARI = ["logreg", "rf", "xgboost", "lightgbm"]
+MODEL_ADLARI = ["logreg", "rf", "xgboost", "lightgbm", "catboost", "ebm"]
 
 
 def model_uzayi(model_adi: str, seed: int):
@@ -63,6 +67,28 @@ def model_uzayi(model_adi: str, seed: int):
             "model__reg_lambda": [0.0, 1.0, 5.0],
         }
         return est, dist, 40, False
+
+    if model_adi == "catboost":
+        est = CatBoostClassifier(
+            random_seed=seed, thread_count=1, verbose=0, allow_writing_files=False,
+        )
+        dist = {
+            "model__iterations": [200, 300, 400, 600],
+            "model__depth": [4, 6, 8],
+            "model__learning_rate": [0.02, 0.05, 0.1],
+            "model__l2_leaf_reg": [1.0, 3.0, 9.0],
+            "model__subsample": [0.7, 0.85, 1.0],
+        }
+        return est, dist, 40, False
+
+    if model_adi == "ebm":
+        est = ExplainableBoostingClassifier(random_state=seed, n_jobs=1, interactions=0)
+        dist = {
+            "model__max_bins": [128, 256],
+            "model__learning_rate": [0.01, 0.02],
+            "model__max_rounds": [2000, 5000],
+        }
+        return est, dist, 6, False
 
     raise ValueError(f"unknown model: {model_adi}")
 

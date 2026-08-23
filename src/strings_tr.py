@@ -102,6 +102,8 @@ MODEL_AD = {
     "rf": "Random Forest",
     "xgboost": "XGBoost",
     "lightgbm": "LightGBM",
+    "catboost": "CatBoost",
+    "ebm": "Explainable Boosting Machine",
 }
 YONTEM_AD = {
     "ham": "Ham (kalibre değil)",

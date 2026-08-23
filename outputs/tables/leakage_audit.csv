@@ -1,0 +1,109 @@
+Dataset,Feature,Univariate AUC,Flag,Recommended action,Rationale
+bank,Age,0.7321,-,keep,-
+bank,IsActiveMember,0.5969,-,keep,Activity status may overlap definitionally with churn.
+bank,Geography,0.587,-,keep,-
+bank,NumOfProducts,0.5789,-,keep,-
+bank,Balance,0.5777,-,keep,-
+bank,Gender,0.5588,-,keep,-
+bank,CreditScore,0.5167,-,keep,-
+bank,Tenure,0.51,-,keep,-
+bank,EstimatedSalary,0.5087,-,keep,-
+bank,HasCrCard,0.504,-,keep,-
+cell2cell,CurrentEquipmentDays,0.5745,-,keep,-
+cell2cell,TotalRecurringCharge,0.5425,-,keep,-
+cell2cell,MonthlyMinutes,0.5395,-,keep,-
+cell2cell,OffPeakCallsInOut,0.5354,-,keep,-
+cell2cell,InboundCalls,0.5351,-,keep,-
+cell2cell,CreditRating,0.5315,-,keep,-
+cell2cell,PeakCallsInOut,0.5312,-,keep,-
+cell2cell,PercChangeMinutes,0.531,-,keep,-
+cell2cell,ReceivedCalls,0.5304,-,keep,-
+cell2cell,CustomerCareCalls,0.5303,-,keep,-
+cell2cell,UnansweredCalls,0.5295,-,keep,-
+cell2cell,OutboundCalls,0.5291,-,keep,-
+cell2cell,MonthsInService,0.5252,-,keep,-
+cell2cell,UniqueSubs,0.5246,-,keep,-
+cell2cell,HandsetModels,0.5231,-,keep,-
+cell2cell,CallWaitingCalls,0.5226,-,keep,-
+cell2cell,ServiceArea,0.5218,-,keep,-
+cell2cell,Handsets,0.5207,-,keep,-
+cell2cell,AgeHH1,0.5196,-,keep,-
+cell2cell,HandsetWebCapable,0.519,-,keep,-
+cell2cell,DroppedBlockedCalls,0.5178,-,keep,-
+cell2cell,DroppedCalls,0.5166,-,keep,-
+cell2cell,HandsetPrice,0.5158,-,keep,-
+cell2cell,ThreewayCalls,0.5156,-,keep,-
+cell2cell,MonthlyRevenue,0.515,-,keep,-
+cell2cell,DirectorAssistedCalls,0.5147,-,keep,-
+cell2cell,RetentionCalls,0.5135,-,keep,Retention call may have occurred after the churn decision.
+cell2cell,MaritalStatus,0.5134,-,keep,-
+cell2cell,MadeCallToRetentionTeam,0.5124,-,keep,Contact with retention team may coincide with the churn signal.
+cell2cell,OverageMinutes,0.5119,-,keep,-
+cell2cell,ActiveSubs,0.5114,-,keep,-
+cell2cell,BlockedCalls,0.511,-,keep,-
+cell2cell,HandsetRefurbished,0.5106,-,keep,-
+cell2cell,RespondsToMailOffers,0.5101,-,keep,-
+cell2cell,AgeHH2,0.5098,-,keep,-
+cell2cell,BuysViaMailOrder,0.5088,-,keep,-
+cell2cell,OwnsComputer,0.5088,-,keep,-
+cell2cell,PrizmCode,0.5081,-,keep,-
+cell2cell,IncomeGroup,0.5068,-,keep,-
+cell2cell,RetentionOffersAccepted,0.5052,-,keep,Retention offer concurrent with the churn process; look-ahead risk.
+cell2cell,Homeownership,0.5047,-,keep,-
+cell2cell,AdjustmentsToCreditRating,0.5033,-,keep,-
+cell2cell,ChildrenInHH,0.5032,-,keep,-
+cell2cell,PercChangeRevenues,0.5028,-,keep,-
+cell2cell,ReferralsMadeBySubscriber,0.5023,-,keep,-
+cell2cell,NewCellphoneUser,0.5021,-,keep,-
+cell2cell,HasCreditCard,0.5015,-,keep,-
+cell2cell,OptOutMailings,0.5012,-,keep,-
+cell2cell,RoamingCalls,0.501,-,keep,-
+cell2cell,NotNewCellphoneUser,0.501,-,keep,-
+cell2cell,TruckOwner,0.5008,-,keep,-
+cell2cell,Occupation,0.5008,-,keep,-
+cell2cell,CallForwardingCalls,0.5004,-,keep,-
+cell2cell,OwnsMotorcycle,0.5004,-,keep,-
+cell2cell,NonUSTravel,0.5001,-,keep,-
+cell2cell,RVOwner,0.5,-,keep,-
+ecommerce,Tenure,0.8024,-,keep,-
+ecommerce,PreferedOrderCat,0.6653,-,keep,-
+ecommerce,Complain,0.6563,-,keep,-
+ecommerce,CashbackAmount,0.6401,-,keep,-
+ecommerce,DaySinceLastOrder,0.6384,-,keep,Days since last order may be close to the churn definition.
+ecommerce,MaritalStatus,0.6173,-,keep,-
+ecommerce,SatisfactionScore,0.5793,-,keep,-
+ecommerce,NumberOfDeviceRegistered,0.5751,-,keep,-
+ecommerce,WarehouseToHome,0.5562,-,keep,-
+ecommerce,NumberOfAddress,0.5189,-,keep,-
+iranian,Status,0.7961,-,keep,'Status' may be directly related to the churn state.
+iranian,Seconds of Use,0.7909,-,keep,-
+iranian,Customer Value,0.7863,-,keep,-
+iranian,Frequency of use,0.7724,-,keep,-
+iranian,Distinct Called Numbers,0.7393,-,keep,-
+iranian,Complains,0.6943,-,keep,-
+iranian,Charge  Amount,0.6793,-,keep,-
+iranian,Frequency of SMS,0.6769,-,keep,-
+iranian,Tariff Plan,0.5389,-,keep,-
+iranian,Subscription  Length,0.5274,-,keep,-
+iranian,Call  Failure,0.5252,-,keep,-
+iranian,Age Group,0.5038,-,keep,-
+iranian,Age,0.5038,-,keep,-
+telco,tenure,0.7399,-,keep,-
+telco,Contract,0.7351,-,keep,-
+telco,OnlineSecurity,0.7014,-,keep,-
+telco,TechSupport,0.6975,-,keep,-
+telco,InternetService,0.6883,-,keep,-
+telco,OnlineBackup,0.6718,-,keep,-
+telco,DeviceProtection,0.6666,-,keep,-
+telco,PaymentMethod,0.6662,-,keep,-
+telco,TotalCharges,0.6503,-,keep,-
+telco,MonthlyCharges,0.6208,-,keep,-
+telco,StreamingTV,0.6145,-,keep,-
+telco,StreamingMovies,0.6128,-,keep,-
+telco,PaperlessBilling,0.5998,-,keep,-
+telco,Dependents,0.5757,-,keep,-
+telco,Partner,0.5739,-,keep,-
+telco,SeniorCitizen,0.563,-,keep,-
+telco,MultipleLines,0.5153,-,keep,-
+telco,PhoneService,0.5007,-,keep,-
+telco,gender,0.5003,-,keep,-

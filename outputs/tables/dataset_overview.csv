@@ -1,0 +1,7 @@
+Dataset,Sector,Rows,Columns,Churn %,Missing (before),Missing (after),Note
+telco,telecom,7043,21,26.5,0,0,
+cell2cell,telecom,51047,58,28.8,3515,3515,
+ecommerce,ecommerce,3941,11,17.1,576,576,
+iranian,telecom,3150,14,15.7,0,0,
+bank,banking,10000,14,20.4,0,0,
+cell2cell_test,telecom,20000,58,,1304,1304,Unlabeled holdout — excluded from churn-based analyses

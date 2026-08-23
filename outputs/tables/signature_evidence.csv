@@ -1,0 +1,6 @@
+Dataset,PR-AUC,EMP,Churner CLV median,Churner CLV Gini,Churner CLV CV,Churn rate
+telco,0.6635,0.0491,1911.6,0.184,0.331,0.265
+cell2cell,0.4663,0.0352,1146.7,0.345,0.766,0.288
+ecommerce,0.9084,0.0161,3584.2,0.123,0.237,0.171
+iranian,0.9576,0.0007,96.8,0.502,1.036,0.157
+bank,0.7065,0.0319,4374.0,0.35,0.64,0.204

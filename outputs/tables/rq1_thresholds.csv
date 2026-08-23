@@ -1,0 +1,26 @@
+Dataset,Method,Threshold
+telco,Baseline (natural),0.5000 ± 0.0000
+telco,Class-weight,0.5000 ± 0.0000
+telco,SMOTENC/SMOTE,0.5000 ± 0.0000
+telco,ADASYN,0.5000 ± 0.0000
+telco,Threshold shift (max-F1),0.3282 ± 0.0602
+cell2cell,Baseline (natural),0.5000 ± 0.0000
+cell2cell,Class-weight,0.5000 ± 0.0000
+cell2cell,SMOTENC/SMOTE,0.5000 ± 0.0000
+cell2cell,ADASYN,0.5000 ± 0.0000
+cell2cell,Threshold shift (max-F1),0.2501 ± 0.0077
+ecommerce,Baseline (natural),0.5000 ± 0.0000
+ecommerce,Class-weight,0.5000 ± 0.0000
+ecommerce,SMOTENC/SMOTE,0.5000 ± 0.0000
+ecommerce,ADASYN,0.5000 ± 0.0000
+ecommerce,Threshold shift (max-F1),0.3425 ± 0.1102
+iranian,Baseline (natural),0.5000 ± 0.0000
+iranian,Class-weight,0.5000 ± 0.0000
+iranian,SMOTENC/SMOTE,0.5000 ± 0.0000
+iranian,ADASYN,0.5000 ± 0.0000
+iranian,Threshold shift (max-F1),0.3213 ± 0.1419
+bank,Baseline (natural),0.5000 ± 0.0000
+bank,Class-weight,0.5000 ± 0.0000
+bank,SMOTENC/SMOTE,0.5000 ± 0.0000
+bank,ADASYN,0.5000 ± 0.0000
+bank,Threshold shift (max-F1),0.3277 ± 0.0416

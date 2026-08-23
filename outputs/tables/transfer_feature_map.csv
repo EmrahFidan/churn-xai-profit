@@ -1,0 +1,17 @@
+Scenario,Concept,Source feature,Target feature
+A1,Relationship duration (tenure),MonthsInService,Subscription  Length
+A1,Usage volume,MonthlyMinutes,Status
+A1,Complaint / support / service quality,DroppedCalls,Complains
+A1,Monetary value / spending,TotalRecurringCharge,Customer Value
+A1,Demographics,AgeHH1,Age Group
+A2,Relationship duration (tenure),Subscription  Length,MonthsInService
+A2,Usage volume,Status,MonthlyMinutes
+A2,Complaint / support / service quality,Complains,DroppedCalls
+A2,Monetary value / spending,Customer Value,TotalRecurringCharge
+A2,Demographics,Age Group,AgeHH1
+B1,Relationship duration (tenure),tenure,Tenure
+B1,Monetary value / spending,MonthlyCharges,Balance
+B1,Demographics,SeniorCitizen,Age
+B2,Relationship duration (tenure),Tenure,tenure
+B2,Monetary value / spending,Balance,MonthlyCharges
+B2,Demographics,Age,SeniorCitizen

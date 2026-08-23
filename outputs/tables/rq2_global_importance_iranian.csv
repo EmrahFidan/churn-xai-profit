@@ -1,0 +1,14 @@
+Feature,Mean |SHAP|,Rank,Concept
+Status,1.173679,1,Usage volume
+Frequency of use,1.109972,2,Usage volume
+Complains,0.848974,3,Complaint / support / service quality
+Seconds of Use,0.745839,4,Usage volume
+Call  Failure,0.618784,5,Complaint / support / service quality
+Customer Value,0.533242,6,Monetary value / spending
+Subscription  Length,0.519903,7,Relationship duration (tenure)
+Frequency of SMS,0.296811,8,Usage volume
+Distinct Called Numbers,0.249029,9,Usage volume
+Age Group,0.22621,10,Demographics
+Charge  Amount,0.095695,11,Monetary value / spending
+Tariff Plan,0.000209,12,Payment / billing type
+Age,0.0,13,Demographics

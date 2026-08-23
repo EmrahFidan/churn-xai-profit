@@ -1,0 +1,11 @@
+Feature,Mean |SHAP|,Rank,Concept
+Age,0.739267,1,Demographics
+NumOfProducts,0.673126,2,Service / subscription scope
+IsActiveMember,0.339377,3,Usage volume
+Balance,0.212865,4,Monetary value / spending
+Geography,0.195034,5,Demographics
+Gender,0.191221,6,Demographics
+EstimatedSalary,0.053917,7,Monetary value / spending
+CreditScore,0.038326,8,Credit / risk
+Tenure,0.025776,9,Relationship duration (tenure)
+HasCrCard,0.005487,10,Payment / billing type

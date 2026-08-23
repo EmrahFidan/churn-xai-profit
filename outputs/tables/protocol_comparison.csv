@@ -1,0 +1,21 @@
+Dataset,Model,before,after,difference
+telco,Logistic Regression,0.6569,0.6569,0.0
+telco,Random Forest,0.6627,0.6627,0.0
+telco,XGBoost,0.6648,0.6648,0.0
+telco,LightGBM,0.6635,0.6635,0.0
+cell2cell,Logistic Regression,0.384,0.384,0.0
+cell2cell,Random Forest,0.4507,0.4507,0.0
+cell2cell,XGBoost,0.4664,0.4671,0.0007
+cell2cell,LightGBM,0.4661,0.4663,0.0002
+ecommerce,Logistic Regression,0.6841,0.6853,0.0012
+ecommerce,Random Forest,0.8911,0.8912,0.0001
+ecommerce,XGBoost,0.8898,0.8923,0.0025
+ecommerce,LightGBM,0.9075,0.9084,0.0009
+iranian,Logistic Regression,0.7628,0.7628,0.0
+iranian,Random Forest,0.9349,0.9349,0.0
+iranian,XGBoost,0.9522,0.9522,0.0
+iranian,LightGBM,0.9576,0.9576,0.0
+bank,Logistic Regression,0.4717,0.4717,0.0
+bank,Random Forest,0.7013,0.7013,0.0
+bank,XGBoost,0.71,0.71,0.0
+bank,LightGBM,0.7065,0.7065,0.0

@@ -4,7 +4,6 @@ __pycache__/
 *.pyc
 .DS_Store
 .ipynb_checkpoints/
-outputs/
 Makale-DATA/
 data/holdout/*.csv
 data/processed/*.csv

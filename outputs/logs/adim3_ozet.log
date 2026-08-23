@@ -1,0 +1,105 @@
+telco       (7043, 20)  churn=%26.5
+cell2cell   (51047, 57)  churn=%28.8
+ecommerce   (3941, 11)  churn=%17.1
+iranian     (3150, 14)  churn=%15.7
+bank        (10000, 11)  churn=%20.4
+NOTE: ADASYN operates on the encoded matrix; it produces fractional values for one-hot categorical columns (synthetic samples fall outside 0/1) — to be noted in Methods/limitations.
+===== RQ1 BALANCING =====
+telco: RQ1 class-balancing comparison (LightGBM fixed, 5 conditions) (17s)
+  telco / Baseline (natural): PR-AUC=0.664 recall=0.518 precision=0.666 ECE=0.022 threshold=0.500
+  telco / Class-weight: PR-AUC=0.664 recall=0.780 precision=0.528 ECE=0.131 threshold=0.500
+  telco / SMOTENC/SMOTE: PR-AUC=0.638 recall=0.685 precision=0.569 ECE=0.084 threshold=0.500
+  telco / ADASYN: PR-AUC=0.653 recall=0.577 precision=0.618 ECE=0.035 threshold=0.500
+  telco / Threshold shift (max-F1): PR-AUC=0.664 recall=0.741 precision=0.571 ECE=0.022 threshold=0.328
+cell2cell: RQ1 class-balancing comparison (LightGBM fixed, 5 conditions) (129s)
+  cell2cell / Baseline (natural): PR-AUC=0.466 recall=0.139 precision=0.596 ECE=0.008 threshold=0.500
+  cell2cell / Class-weight: PR-AUC=0.464 recall=0.610 precision=0.411 ECE=0.169 threshold=0.500
+  cell2cell / SMOTENC/SMOTE: PR-AUC=0.434 recall=0.194 precision=0.504 ECE=0.032 threshold=0.500
+  cell2cell / ADASYN: PR-AUC=0.461 recall=0.137 precision=0.584 ECE=0.011 threshold=0.500
+  cell2cell / Threshold shift (max-F1): PR-AUC=0.466 recall=0.752 precision=0.382 ECE=0.008 threshold=0.250
+ecommerce: RQ1 class-balancing comparison (LightGBM fixed, 5 conditions) (81s)
+  ecommerce / Baseline (natural): PR-AUC=0.908 recall=0.816 precision=0.881 ECE=0.038 threshold=0.500
+  ecommerce / Class-weight: PR-AUC=0.907 recall=0.837 precision=0.849 ECE=0.042 threshold=0.500
+  ecommerce / SMOTENC/SMOTE: PR-AUC=0.887 recall=0.831 precision=0.826 ECE=0.048 threshold=0.500
+  ecommerce / ADASYN: PR-AUC=0.908 recall=0.828 precision=0.885 ECE=0.043 threshold=0.500
+  ecommerce / Threshold shift (max-F1): PR-AUC=0.908 recall=0.846 precision=0.867 ECE=0.038 threshold=0.342
+iranian: RQ1 class-balancing comparison (LightGBM fixed, 5 conditions) (73s)
+  iranian / Baseline (natural): PR-AUC=0.958 recall=0.851 precision=0.893 ECE=0.018 threshold=0.500
+  iranian / Class-weight: PR-AUC=0.954 recall=0.915 precision=0.853 ECE=0.019 threshold=0.500
+  iranian / SMOTENC/SMOTE: PR-AUC=0.954 recall=0.923 precision=0.836 ECE=0.025 threshold=0.500
+  iranian / ADASYN: PR-AUC=0.953 recall=0.887 precision=0.871 ECE=0.022 threshold=0.500
+  iranian / Threshold shift (max-F1): PR-AUC=0.958 recall=0.921 precision=0.878 ECE=0.018 threshold=0.321
+bank: RQ1 class-balancing comparison (LightGBM fixed, 5 conditions) (19s)
+  bank / Baseline (natural): PR-AUC=0.706 recall=0.481 precision=0.760 ECE=0.020 threshold=0.500
+  bank / Class-weight: PR-AUC=0.706 recall=0.743 precision=0.526 ECE=0.152 threshold=0.500
+  bank / SMOTENC/SMOTE: PR-AUC=0.657 recall=0.683 precision=0.531 ECE=0.131 threshold=0.500
+  bank / ADASYN: PR-AUC=0.698 recall=0.543 precision=0.701 ECE=0.035 threshold=0.500
+  bank / Threshold shift (max-F1): PR-AUC=0.706 recall=0.632 precision=0.642 ECE=0.020 threshold=0.328
+===== RQ1 COMPARISON (fold avg ± std) =====
+  Dataset                   Method          PR-AUC         ROC-AUC          Recall       Precision              F1             ECE           Brier       Threshold
+    telco       Baseline (natural) 0.6635 ± 0.0223 0.8469 ± 0.0108 0.5179 ± 0.0353 0.6661 ± 0.0241 0.5825 ± 0.0303 0.0224 ± 0.0077 0.1345 ± 0.0045 0.5000 ± 0.0000
+    telco             Class-weight 0.6639 ± 0.0233 0.8459 ± 0.0107 0.7801 ± 0.0179 0.5278 ± 0.0112 0.6295 ± 0.0123 0.1310 ± 0.0058 0.1584 ± 0.0047 0.5000 ± 0.0000
+    telco            SMOTENC/SMOTE 0.6384 ± 0.0245 0.8395 ± 0.0104 0.6848 ± 0.0333 0.5695 ± 0.0109 0.6216 ± 0.0187 0.0838 ± 0.0066 0.1500 ± 0.0040 0.5000 ± 0.0000
+    telco                   ADASYN 0.6527 ± 0.0235 0.8428 ± 0.0107 0.5768 ± 0.0305 0.6178 ± 0.0126 0.5964 ± 0.0213 0.0353 ± 0.0047 0.1381 ± 0.0043 0.5000 ± 0.0000
+    telco Threshold shift (max-F1) 0.6635 ± 0.0223 0.8469 ± 0.0108 0.7410 ± 0.0559 0.5714 ± 0.0385 0.6421 ± 0.0143 0.0224 ± 0.0077 0.1345 ± 0.0045 0.3282 ± 0.0602
+cell2cell       Baseline (natural) 0.4663 ± 0.0068 0.6842 ± 0.0044 0.1394 ± 0.0041 0.5964 ± 0.0173 0.2260 ± 0.0058 0.0080 ± 0.0017 0.1868 ± 0.0009 0.5000 ± 0.0000
+cell2cell             Class-weight 0.4636 ± 0.0065 0.6836 ± 0.0045 0.6095 ± 0.0039 0.4108 ± 0.0033 0.4908 ± 0.0031 0.1693 ± 0.0018 0.2170 ± 0.0011 0.5000 ± 0.0000
+cell2cell            SMOTENC/SMOTE 0.4344 ± 0.0061 0.6674 ± 0.0048 0.1944 ± 0.0032 0.5041 ± 0.0180 0.2805 ± 0.0044 0.0317 ± 0.0020 0.1920 ± 0.0011 0.5000 ± 0.0000
+cell2cell                   ADASYN 0.4606 ± 0.0069 0.6831 ± 0.0041 0.1366 ± 0.0052 0.5837 ± 0.0214 0.2214 ± 0.0076 0.0107 ± 0.0016 0.1873 ± 0.0008 0.5000 ± 0.0000
+cell2cell Threshold shift (max-F1) 0.4663 ± 0.0068 0.6842 ± 0.0044 0.7517 ± 0.0225 0.3819 ± 0.0024 0.5063 ± 0.0044 0.0080 ± 0.0017 0.1868 ± 0.0009 0.2501 ± 0.0077
+ecommerce       Baseline (natural) 0.9084 ± 0.0162 0.9664 ± 0.0072 0.8161 ± 0.0317 0.8812 ± 0.0141 0.8472 ± 0.0224 0.0379 ± 0.0059 0.0435 ± 0.0063 0.5000 ± 0.0000
+ecommerce             Class-weight 0.9075 ± 0.0180 0.9659 ± 0.0075 0.8368 ± 0.0352 0.8492 ± 0.0159 0.8428 ± 0.0244 0.0416 ± 0.0046 0.0445 ± 0.0060 0.5000 ± 0.0000
+ecommerce            SMOTENC/SMOTE 0.8870 ± 0.0312 0.9641 ± 0.0104 0.8309 ± 0.0360 0.8263 ± 0.0327 0.8283 ± 0.0311 0.0481 ± 0.0109 0.0504 ± 0.0095 0.5000 ± 0.0000
+ecommerce                   ADASYN 0.9083 ± 0.0224 0.9691 ± 0.0076 0.8279 ± 0.0361 0.8853 ± 0.0241 0.8556 ± 0.0304 0.0427 ± 0.0079 0.0437 ± 0.0085 0.5000 ± 0.0000
+ecommerce Threshold shift (max-F1) 0.9084 ± 0.0162 0.9664 ± 0.0072 0.8457 ± 0.0416 0.8666 ± 0.0181 0.8554 ± 0.0235 0.0379 ± 0.0059 0.0435 ± 0.0063 0.3425 ± 0.1102
+  iranian       Baseline (natural) 0.9576 ± 0.0115 0.9896 ± 0.0029 0.8505 ± 0.0251 0.8927 ± 0.0244 0.8707 ± 0.0169 0.0176 ± 0.0056 0.0275 ± 0.0040 0.5000 ± 0.0000
+  iranian             Class-weight 0.9536 ± 0.0105 0.9887 ± 0.0029 0.9152 ± 0.0137 0.8535 ± 0.0172 0.8831 ± 0.0105 0.0188 ± 0.0034 0.0289 ± 0.0031 0.5000 ± 0.0000
+  iranian            SMOTENC/SMOTE 0.9543 ± 0.0117 0.9895 ± 0.0030 0.9232 ± 0.0208 0.8357 ± 0.0233 0.8772 ± 0.0204 0.0248 ± 0.0035 0.0308 ± 0.0050 0.5000 ± 0.0000
+  iranian                   ADASYN 0.9527 ± 0.0108 0.9883 ± 0.0034 0.8869 ± 0.0206 0.8715 ± 0.0224 0.8789 ± 0.0172 0.0215 ± 0.0053 0.0290 ± 0.0042 0.5000 ± 0.0000
+  iranian Threshold shift (max-F1) 0.9576 ± 0.0115 0.9896 ± 0.0029 0.9212 ± 0.0242 0.8782 ± 0.0277 0.8986 ± 0.0135 0.0176 ± 0.0056 0.0275 ± 0.0040 0.3213 ± 0.1419
+     bank       Baseline (natural) 0.7065 ± 0.0150 0.8667 ± 0.0061 0.4806 ± 0.0204 0.7605 ± 0.0188 0.5887 ± 0.0171 0.0202 ± 0.0035 0.1016 ± 0.0026 0.5000 ± 0.0000
+     bank             Class-weight 0.7056 ± 0.0161 0.8659 ± 0.0073 0.7428 ± 0.0253 0.5256 ± 0.0169 0.6153 ± 0.0160 0.1517 ± 0.0053 0.1335 ± 0.0030 0.5000 ± 0.0000
+     bank            SMOTENC/SMOTE 0.6574 ± 0.0132 0.8545 ± 0.0056 0.6834 ± 0.0147 0.5305 ± 0.0126 0.5972 ± 0.0108 0.1307 ± 0.0044 0.1327 ± 0.0029 0.5000 ± 0.0000
+     bank                   ADASYN 0.6978 ± 0.0158 0.8647 ± 0.0060 0.5430 ± 0.0168 0.7010 ± 0.0092 0.6118 ± 0.0113 0.0353 ± 0.0033 0.1040 ± 0.0025 0.5000 ± 0.0000
+     bank Threshold shift (max-F1) 0.7065 ± 0.0150 0.8667 ± 0.0061 0.6323 ± 0.0410 0.6416 ± 0.0255 0.6356 ± 0.0169 0.0202 ± 0.0035 0.1016 ± 0.0026 0.3277 ± 0.0416
+Saved: /Users/emrahfidan/Desktop/makale-2/outputs/tables/rq1_imbalance_comparison.csv
+Saved: /Users/emrahfidan/Desktop/makale-2/outputs/tables/rq1_thresholds.csv
+===== FIGURES =====
+telco: 4 figures -> /Users/emrahfidan/Desktop/makale-2/outputs/figures/telco
+cell2cell: 4 figures -> /Users/emrahfidan/Desktop/makale-2/outputs/figures/cell2cell
+ecommerce: 4 figures -> /Users/emrahfidan/Desktop/makale-2/outputs/figures/ecommerce
+iranian: 4 figures -> /Users/emrahfidan/Desktop/makale-2/outputs/figures/iranian
+bank: 4 figures -> /Users/emrahfidan/Desktop/makale-2/outputs/figures/bank
+===== SUMMARY — relative to baseline =====
+
+### telco  (baseline: PR-AUC=0.664 recall=0.518 precision=0.666 F1=0.582 ECE=0.022)
+  Class-weight             ΔPR-AUC=+0.000 | recall 0.518->0.780 (+0.262) | precision 0.666->0.528 (-0.138) | F1 +0.047 | ECE +0.109
+  SMOTENC/SMOTE            ΔPR-AUC=-0.025 | recall 0.518->0.685 (+0.167) | precision 0.666->0.569 (-0.097) | F1 +0.039 | ECE +0.061
+  ADASYN                   ΔPR-AUC=-0.011 | recall 0.518->0.577 (+0.059) | precision 0.666->0.618 (-0.048) | F1 +0.014 | ECE +0.013
+  Threshold shift (max-F1) ΔPR-AUC=+0.000 | recall 0.518->0.741 (+0.223) | precision 0.666->0.571 (-0.095) | F1 +0.060 | ECE +0.000
+
+### cell2cell  (baseline: PR-AUC=0.466 recall=0.139 precision=0.596 F1=0.226 ECE=0.008)
+  Class-weight             ΔPR-AUC=-0.003 | recall 0.139->0.610 (+0.470) | precision 0.596->0.411 (-0.186) | F1 +0.265 | ECE +0.161
+  SMOTENC/SMOTE            ΔPR-AUC=-0.032 | recall 0.139->0.194 (+0.055) | precision 0.596->0.504 (-0.092) | F1 +0.055 | ECE +0.024
+  ADASYN                   ΔPR-AUC=-0.006 | recall 0.139->0.137 (-0.003) | precision 0.596->0.584 (-0.013) | F1 -0.005 | ECE +0.003
+  Threshold shift (max-F1) ΔPR-AUC=+0.000 | recall 0.139->0.752 (+0.612) | precision 0.596->0.382 (-0.215) | F1 +0.280 | ECE +0.000
+
+### ecommerce  (baseline: PR-AUC=0.908 recall=0.816 precision=0.881 F1=0.847 ECE=0.038)
+  Class-weight             ΔPR-AUC=-0.001 | recall 0.816->0.837 (+0.021) | precision 0.881->0.849 (-0.032) | F1 -0.004 | ECE +0.004
+  SMOTENC/SMOTE            ΔPR-AUC=-0.021 | recall 0.816->0.831 (+0.015) | precision 0.881->0.826 (-0.055) | F1 -0.019 | ECE +0.010
+  ADASYN                   ΔPR-AUC=-0.000 | recall 0.816->0.828 (+0.012) | precision 0.881->0.885 (+0.004) | F1 +0.008 | ECE +0.005
+  Threshold shift (max-F1) ΔPR-AUC=+0.000 | recall 0.816->0.846 (+0.030) | precision 0.881->0.867 (-0.015) | F1 +0.008 | ECE +0.000
+
+### iranian  (baseline: PR-AUC=0.958 recall=0.851 precision=0.893 F1=0.871 ECE=0.018)
+  Class-weight             ΔPR-AUC=-0.004 | recall 0.851->0.915 (+0.065) | precision 0.893->0.853 (-0.039) | F1 +0.012 | ECE +0.001
+  SMOTENC/SMOTE            ΔPR-AUC=-0.003 | recall 0.851->0.923 (+0.073) | precision 0.893->0.836 (-0.057) | F1 +0.007 | ECE +0.007
+  ADASYN                   ΔPR-AUC=-0.005 | recall 0.851->0.887 (+0.036) | precision 0.893->0.871 (-0.021) | F1 +0.008 | ECE +0.004
+  Threshold shift (max-F1) ΔPR-AUC=+0.000 | recall 0.851->0.921 (+0.071) | precision 0.893->0.878 (-0.015) | F1 +0.028 | ECE +0.000
+
+### bank  (baseline: PR-AUC=0.706 recall=0.481 precision=0.760 F1=0.589 ECE=0.020)
+  Class-weight             ΔPR-AUC=-0.001 | recall 0.481->0.743 (+0.262) | precision 0.760->0.526 (-0.235) | F1 +0.027 | ECE +0.131
+  SMOTENC/SMOTE            ΔPR-AUC=-0.049 | recall 0.481->0.683 (+0.203) | precision 0.760->0.531 (-0.230) | F1 +0.009 | ECE +0.110
+  ADASYN                   ΔPR-AUC=-0.009 | recall 0.481->0.543 (+0.062) | precision 0.760->0.701 (-0.059) | F1 +0.023 | ECE +0.015
+  Threshold shift (max-F1) ΔPR-AUC=+0.000 | recall 0.481->0.632 (+0.152) | precision 0.760->0.642 (-0.119) | F1 +0.047 | ECE +0.000
+
+STEP 3 (RQ1) complete. Method choice/interpretation left to the user. No SHAP/RQ2 performed.

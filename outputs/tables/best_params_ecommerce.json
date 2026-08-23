@@ -1,0 +1,37 @@
+{
+  "logreg": {
+    "model__C": 10.0
+  },
+  "rf": {
+    "model__n_estimators": 300,
+    "model__min_samples_leaf": 1,
+    "model__max_features": 0.5,
+    "model__max_depth": null
+  },
+  "xgboost": {
+    "model__subsample": 0.85,
+    "model__reg_lambda": 1.0,
+    "model__n_estimators": 400,
+    "model__min_child_weight": 1,
+    "model__max_depth": 6,
+    "model__learning_rate": 0.1,
+    "model__colsample_bytree": 1.0
+  },
+  "lightgbm": {
+    "model__subsample_freq": 1,
+    "model__subsample": 0.85,
+    "model__reg_lambda": 0.0,
+    "model__num_leaves": 127,
+    "model__n_estimators": 600,
+    "model__min_child_samples": 50,
+    "model__learning_rate": 0.1,
+    "model__colsample_bytree": 0.7
+  },
+  "catboost": {
+    "model__subsample": 0.7,
+    "model__learning_rate": 0.05,
+    "model__l2_leaf_reg": 1.0,
+    "model__iterations": 600,
+    "model__depth": 8
+  }
+}

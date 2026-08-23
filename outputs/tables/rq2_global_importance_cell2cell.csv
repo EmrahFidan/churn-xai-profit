@@ -1,0 +1,58 @@
+Feature,Mean |SHAP|,Rank,Concept
+CurrentEquipmentDays,0.295195,1,Device / equipment
+MonthlyMinutes,0.174772,2,Usage volume
+MonthsInService,0.168568,3,Relationship duration (tenure)
+PercChangeMinutes,0.150528,4,Usage decline
+CreditRating,0.096005,5,Credit / risk
+UniqueSubs,0.089922,6,Service / subscription scope
+OverageMinutes,0.07726,7,Usage volume
+TotalRecurringCharge,0.076619,8,Monetary value / spending
+AgeHH1,0.073316,9,Demographics
+InboundCalls,0.048764,10,Usage volume
+MonthlyRevenue,0.044552,11,Monetary value / spending
+DroppedCalls,0.04351,12,Complaint / support / service quality
+DroppedBlockedCalls,0.042881,13,Complaint / support / service quality
+PercChangeRevenues,0.042335,14,Usage decline
+HandsetRefurbished,0.042098,15,Device / equipment
+RetentionCalls,0.032787,16,Complaint / support / service quality
+MaritalStatus,0.032188,17,Demographics
+HandsetWebCapable,0.030398,18,Device / equipment
+OffPeakCallsInOut,0.025639,19,Usage volume
+Handsets,0.025335,20,Device / equipment
+BlockedCalls,0.025245,21,Complaint / support / service quality
+ChildrenInHH,0.025188,22,Demographics
+PrizmCode,0.02444,23,Demographics
+CustomerCareCalls,0.023679,24,Complaint / support / service quality
+PeakCallsInOut,0.022256,25,Usage volume
+ServiceArea,0.021211,26,Demographics
+ActiveSubs,0.02096,27,Service / subscription scope
+RoamingCalls,0.02084,28,Usage volume
+ReceivedCalls,0.019944,29,Usage volume
+HandsetPrice,0.01924,30,Device / equipment
+OutboundCalls,0.018579,31,Usage volume
+RespondsToMailOffers,0.017391,32,Other
+IncomeGroup,0.014971,33,Demographics
+AgeHH2,0.012968,34,Demographics
+ThreewayCalls,0.012721,35,Usage volume
+UnansweredCalls,0.012064,36,Complaint / support / service quality
+DirectorAssistedCalls,0.011919,37,Usage volume
+CallWaitingCalls,0.011756,38,Usage volume
+HandsetModels,0.011656,39,Device / equipment
+BuysViaMailOrder,0.009819,40,Other
+MadeCallToRetentionTeam,0.007187,41,Complaint / support / service quality
+HasCreditCard,0.00597,42,Payment / billing type
+OwnsComputer,0.00583,43,Demographics
+NotNewCellphoneUser,0.005366,44,Relationship duration (tenure)
+handsetprice_unknown,0.004777,45,Device / equipment
+Occupation,0.004449,46,Demographics
+NewCellphoneUser,0.003318,47,Relationship duration (tenure)
+AdjustmentsToCreditRating,0.002869,48,Credit / risk
+TruckOwner,0.002682,49,Demographics
+Homeownership,0.001724,50,Demographics
+RVOwner,0.001186,51,Demographics
+NonUSTravel,0.000833,52,Other
+ReferralsMadeBySubscriber,0.000767,53,Usage volume
+RetentionOffersAccepted,0.000373,54,Complaint / support / service quality
+OwnsMotorcycle,0.000274,55,Demographics
+CallForwardingCalls,0.000219,56,Usage volume
+OptOutMailings,0.00017,57,Other

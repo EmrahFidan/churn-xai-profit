@@ -1,0 +1,41 @@
+===== PRE-CHECK & PROFILE =====
+telco         7043x21   churn= 26.5%  (ref 26.5%)  target='Churn'
+    telco: dropped identifier column(s) -> ['customerID']
+cell2cell    51047x58   churn= 28.8%  (ref 28.8%)  target='Churn'
+    cell2cell: dropped identifier column(s) -> ['CustomerID']
+ecommerce     3941x11   churn= 17.1%  (ref 17.1%)  target='Churn'
+iranian       3150x14   churn= 15.7%  (ref 15.7%)  target='Churn'
+bank         10000x14   churn= 20.4%  (ref 20.4%)  target='Exited'
+    bank: dropped identifier column(s) -> ['RowNumber', 'CustomerId', 'Surname']
+cell2cell_test  20000x58   UNLABELED holdout
+Pre-check: 5 datasets + 1 unlabeled holdout found, consistent with reference profiles.
+===== CLEANING =====
+telco       TotalCharges                 text -> numeric | 11 blank; tenure=0 -> 0 (11 rows); remaining 0 kept as NaN
+cell2cell   -                            missing kept | 3515 cells left as NaN, imputed within fold
+cell2cell_test -                            missing kept | 1304 cells left as NaN, imputed within fold
+ecommerce   -                            missing kept | 576 cells left as NaN, imputed within fold
+bank        -                            clean | no missing, untouched
+iranian     -                            clean | no missing, untouched
+Saved: /Users/emrahfidan/Desktop/makale-2/outputs/tables/cleaning_log.csv
+===== LEAKAGE AUDIT =====
+No suspicious (AUC ≥ 0.90) feature found.
+Saved: /Users/emrahfidan/Desktop/makale-2/outputs/tables/leakage_audit.csv
+===== EDA FIGURES =====
+telco: 5 figures -> /Users/emrahfidan/Desktop/makale-2/outputs/figures/telco
+cell2cell: 5 figures -> /Users/emrahfidan/Desktop/makale-2/outputs/figures/cell2cell
+    (high cardinality, skipped in categorical figure: ['ServiceArea', 'HandsetPrice'])
+ecommerce: 5 figures -> /Users/emrahfidan/Desktop/makale-2/outputs/figures/ecommerce
+iranian: 5 figures -> /Users/emrahfidan/Desktop/makale-2/outputs/figures/iranian
+bank: 5 figures -> /Users/emrahfidan/Desktop/makale-2/outputs/figures/bank
+Saved: /Users/emrahfidan/Desktop/makale-2/outputs/tables/dataset_overview.csv
+       Dataset    Sector  Rows  Columns  Churn %  Missing (before)  Missing (after)                                                   Note
+         telco   telecom  7043       21     26.5                 0                0                                                       
+     cell2cell   telecom 51047       58     28.8              3515             3515                                                       
+     ecommerce ecommerce  3941       11     17.1               576              576                                                       
+       iranian   telecom  3150       14     15.7                 0                0                                                       
+          bank   banking 10000       14     20.4                 0                0                                                       
+cell2cell_test   telecom 20000       58      NaN              1304             1304 Unlabeled holdout — excluded from churn-based analyses
+===== SUMMARY =====
+Processed labeled sets: 5 | unlabeled holdout: 1
+Cleaning decision rows: 6 | suspicious features: 0
+STEP 1 complete. Column-drop decision left to the user (leakage). No modeling performed.

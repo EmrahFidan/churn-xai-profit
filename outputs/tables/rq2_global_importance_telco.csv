@@ -1,0 +1,20 @@
+Feature,Mean |SHAP|,Rank,Concept
+Contract,1.083431,1,Contract / commitment
+tenure,0.321308,2,Relationship duration (tenure)
+MonthlyCharges,0.243833,3,Monetary value / spending
+OnlineSecurity,0.233527,4,Service / subscription scope
+InternetService,0.22378,5,Service / subscription scope
+TechSupport,0.171347,6,Complaint / support / service quality
+PaymentMethod,0.164912,7,Payment / billing type
+TotalCharges,0.112684,8,Monetary value / spending
+PaperlessBilling,0.095834,9,Payment / billing type
+OnlineBackup,0.072854,10,Service / subscription scope
+MultipleLines,0.068192,11,Service / subscription scope
+StreamingMovies,0.054133,12,Service / subscription scope
+SeniorCitizen,0.043837,13,Demographics
+StreamingTV,0.036948,14,Service / subscription scope
+Dependents,0.025903,15,Demographics
+gender,0.025443,16,Demographics
+DeviceProtection,0.02378,17,Service / subscription scope
+PhoneService,0.018471,18,Service / subscription scope
+Partner,0.00611,19,Demographics

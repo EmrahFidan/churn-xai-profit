@@ -38,7 +38,14 @@ def _lgbm_params(set_adi):
 
 # ----------------------------- CLV -----------------------------
 def clv_hesapla(set_adi, df):
-    """Per-customer CLV (not uniform) + basis explanation. Negative/0 is handled."""
+    """Per-customer CLV (not uniform) + basis explanation. Negative/0 is handled.
+
+    A few customers have no recorded value in the column the proxy is built from
+    (156 of 51,047 rows in Cell2Cell, none elsewhere). Those are filled with the
+    median of the observed values. Customer value enters the study as an evaluation
+    assumption that is already swept over a grid, not as a model input, so this fill
+    sits outside the modelling pipeline and does not affect the leakage protocol.
+    """
     u = PARAM["ufuk_ay"]
     if set_adi == "telco":
         clv = df["MonthlyCharges"].astype(float) * u
@@ -58,6 +65,8 @@ def clv_hesapla(set_adi, df):
         temel = "Customer Value (direct)"
     else:
         raise ValueError(set_adi)
+    if clv.isna().any():
+        clv = clv.fillna(clv.median())
     clv = clv.clip(lower=0).to_numpy()
     return clv, temel
 
@@ -195,9 +204,18 @@ def tablo_clv(tum):
 
 # ----------------------------- figures -----------------------------
 def _temsili(r):
-    """Representative (c,γ): c=5% of ort_CLV, γ=0.3 (or first if absent)."""
-    oran = 0.05 if 0.05 in PARAM["c_oranlari"] else PARAM["c_oranlari"][0]
-    g = 0.3 if 0.3 in PARAM["gamma_listesi"] else PARAM["gamma_listesi"][0]
+    """Scenario drawn in the threshold and strategy figures.
+
+    The low-cost setting is used because it is the one discussed in the text, where the
+    accuracy-style threshold turns a campaign into a loss. Values come from config.yaml
+    so that the figure and the reported numbers cannot drift apart.
+    """
+    oran = PARAM.get("figur_c_orani", PARAM["c_oranlari"][0])
+    g = PARAM.get("figur_gamma", PARAM["gamma_listesi"][0])
+    if oran not in PARAM["c_oranlari"]:
+        oran = PARAM["c_oranlari"][0]
+    if g not in PARAM["gamma_listesi"]:
+        g = PARAM["gamma_listesi"][0]
     return r["ort_clv"] * oran, g, oran
 
 

@@ -1,0 +1,7 @@
+Dataset,Column,Operation,Detail
+telco,TotalCharges,text -> numeric,11 blank; tenure=0 -> 0 (11 rows); remaining 0 kept as NaN
+cell2cell,-,missing kept,"3515 cells left as NaN, imputed within fold"
+cell2cell_test,-,missing kept,"1304 cells left as NaN, imputed within fold"
+ecommerce,-,missing kept,"576 cells left as NaN, imputed within fold"
+bank,-,clean,"no missing, untouched"
+iranian,-,clean,"no missing, untouched"

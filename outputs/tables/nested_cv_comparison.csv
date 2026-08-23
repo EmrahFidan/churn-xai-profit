@@ -1,0 +1,26 @@
+Dataset,Model,PR-AUC (reported protocol),PR-AUC (nested CV),Nested sd,Difference
+telco,logreg,0.6569,0.6564,0.0291,0.0004
+telco,rf,0.6627,0.6614,0.0309,0.0013
+telco,xgboost,0.6648,0.6642,0.0269,0.0006
+telco,lightgbm,0.6635,0.6624,0.0251,0.0011
+telco,catboost,0.6696,0.6661,0.0215,0.0035
+cell2cell,logreg,0.384,0.384,0.007,0.0
+cell2cell,rf,0.4507,0.4509,0.01,-0.0002
+cell2cell,xgboost,0.4671,0.4656,0.0075,0.0014
+cell2cell,lightgbm,0.4663,0.4653,0.0067,0.0009
+cell2cell,catboost,0.4648,0.4634,0.0065,0.0014
+ecommerce,logreg,0.6853,0.6844,0.0273,0.0009
+ecommerce,rf,0.8912,0.8879,0.0321,0.0033
+ecommerce,xgboost,0.8923,0.8921,0.0327,0.0003
+ecommerce,lightgbm,0.9084,0.9027,0.0238,0.0056
+ecommerce,catboost,0.9111,0.9032,0.0359,0.0079
+iranian,logreg,0.7628,0.7628,0.0199,0.0
+iranian,rf,0.9349,0.932,0.0152,0.0029
+iranian,xgboost,0.9522,0.9517,0.0096,0.0005
+iranian,lightgbm,0.9576,0.9576,0.0128,0.0
+iranian,catboost,0.9571,0.9574,0.0066,-0.0003
+bank,logreg,0.4717,0.4717,0.0305,0.0
+bank,rf,0.7013,0.7013,0.019,0.0
+bank,xgboost,0.71,0.7089,0.0168,0.001
+bank,lightgbm,0.7065,0.7065,0.0168,0.0
+bank,catboost,0.7173,0.7167,0.0173,0.0007

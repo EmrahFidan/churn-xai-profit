@@ -4,8 +4,8 @@ Conditions: baseline (natural, threshold 0.5), class-weight (scale_pos_weight), 
 ADASYN, threshold shifting (max-F1; statistical, not profit). NO WINNER IS SELECTED — the
 trade-off is reported.
 
-LEAKAGE RULE: all resampling, scale_pos_weight and threshold selection ONLY within the
-within-fold training. imblearn Pipeline: [prep] -> [resampler] -> [encode] -> [LightGBM];
+LEAKAGE RULE: imputation, all resampling, scale_pos_weight and threshold selection ONLY within the
+within-fold training. imblearn Pipeline: [prep] -> [impute] -> [resampler] -> [encode] -> [LightGBM];
 the resampler is on the raw features (ADASYN exception: after encode). The validation fold is
 left natural (calibration is measured on the real distribution). Stratified 5-fold (seed=42),
 primary score PR-AUC.
@@ -60,6 +60,7 @@ def _pipeline(parts, kosul, params, seed, spw):
     adimlar = []
     if parts["prep"] is not None:
         adimlar.append(("hazirla", clone(parts["prep"])))
+    adimlar.append(("doldur", clone(parts["impute"])))
     if kosul == "smote":
         adimlar.append(("resample", _resampler(parts, seed)))
         adimlar.append(("ct", clone(parts["ct"])))

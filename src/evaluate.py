@@ -277,13 +277,22 @@ def figur_model_kiyas(set_adi, set_sonuc):
     return _kaydet(fig, set_adi, S.FIG2_DOSYA["model_comparison"])
 
 
+TASIYICI_MODEL = "lightgbm"
+
+
 def figurler_set(set_adi, set_sonuc, y):
-    """Produces the 4 figures for one set. Return: {key: path}."""
+    """Produces the 4 figures for one set. Return: {key: path}.
+
+    The reliability curve is always drawn for the carrier model used in the
+    explanation and profit analyses, so that the figure and the surrounding text
+    refer to the same estimator on every dataset.
+    """
     en_iyi = en_iyi_model(set_sonuc)
+    kalib = TASIYICI_MODEL if TASIYICI_MODEL in set_sonuc["sonuc"] else en_iyi
     yollar = {
         "pr": figur_pr(set_adi, set_sonuc, y),
         "roc": figur_roc(set_adi, set_sonuc, y),
-        "calibration": figur_kalibrasyon(set_adi, en_iyi, set_sonuc["sonuc"][en_iyi], y),
+        "calibration": figur_kalibrasyon(set_adi, kalib, set_sonuc["sonuc"][kalib], y),
         "model_comparison": figur_model_kiyas(set_adi, set_sonuc),
     }
     return yollar, en_iyi

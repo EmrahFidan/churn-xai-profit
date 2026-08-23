@@ -1,0 +1,6 @@
+Concept,Cell2Cell column,Iranian column,Selection rationale
+Usage volume (duration),MonthlyMinutes,Seconds of Use,minute/duration-based usage volume
+Usage frequency (call count),PeakCallsInOut,Frequency of use,peak incoming/outgoing call count: the single measure of usage frequency (minutes is a separate concept)
+Complaint/support,CustomerCareCalls,Complains,customer service contact ~ complaint signal
+Relationship duration,MonthsInService,Subscription  Length,subscription/service tenure
+Monetary value,MonthlyRevenue,Customer Value,the customer's monetary value

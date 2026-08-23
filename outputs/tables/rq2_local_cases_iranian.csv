@@ -1,0 +1,13 @@
+Case,Churn probability,Feature,Raw value,SHAP contribution
+high-risk,0.9996,Complains,1.0,4.8561
+high-risk,0.9996,Seconds of Use,3295.0,1.9205
+high-risk,0.9996,Frequency of use,47.0,1.867
+high-risk,0.9996,Status,2.0,1.7372
+high-risk,0.9996,Call  Failure,14.0,1.382
+high-risk,0.9996,Subscription  Length,37.0,0.5626
+low-risk,0.0,Frequency of use,79.0,-1.372
+low-risk,0.0,Status,1.0,-0.9148
+low-risk,0.0,Subscription  Length,40.0,-0.7374
+low-risk,0.0,Complains,0.0,-0.4906
+low-risk,0.0,Call  Failure,3.0,-0.327
+low-risk,0.0,Frequency of SMS,5.0,-0.218

@@ -9,3 +9,6 @@ matplotlib
 seaborn
 pyyaml
 jupyter
+catboost
+interpret-core
+scipy

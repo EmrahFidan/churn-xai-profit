@@ -1,0 +1,7 @@
+Scenario,Direction,Mapping type,Shared concept count,Transfer PR-AUC,In-domain ref PR-AUC,Full-feature ref PR-AUC,Trivial PR-AUC,Retention ratio,Recall,Precision,F1,Decision
+A1,Cell2Cell -> Iranian,importance-based,5,0.106,0.8449,0.9576,0.1571,0.125,0.3939,0.088,0.1438,WEAK
+A2,Iranian -> Cell2Cell,importance-based,5,0.2777,0.4045,0.4663,0.2882,0.687,0.821,0.2827,0.4206,WEAK
+B1,telco -> bank,importance-based,3,0.2373,0.4503,0.7065,0.2037,0.527,0.7545,0.2408,0.3651,PARTIAL
+B2,bank -> telco,importance-based,3,0.2075,0.6219,0.6635,0.2654,0.334,0.0,0.0,0.0,WEAK
+A1,Cell2Cell -> Iranian,semantic,5,0.2721,0.8703,0.9576,0.1571,0.313,0.1657,0.5062,0.2496,PARTIAL
+A2,Iranian -> Cell2Cell,semantic,5,0.2695,0.3951,0.4663,0.2882,0.682,0.6379,0.2722,0.3815,WEAK

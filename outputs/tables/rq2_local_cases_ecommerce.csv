@@ -1,0 +1,13 @@
+Case,Churn probability,Feature,Raw value,SHAP contribution
+high-risk,1.0,Tenure,0.0,8.257
+high-risk,1.0,Complain,1,6.5516
+high-risk,1.0,CashbackAmount,123.4,4.7471
+high-risk,1.0,DaySinceLastOrder,0.0,3.7546
+high-risk,1.0,NumberOfDeviceRegistered,5,2.8743
+high-risk,1.0,MaritalStatus = Single,Single,1.8427
+low-risk,0.0,Tenure,26.0,-7.5335
+low-risk,0.0,WarehouseToHome,13.0,-3.2079
+low-risk,0.0,CashbackAmount,248.14,-3.0968
+low-risk,0.0,NumberOfDeviceRegistered,1,-2.6614
+low-risk,0.0,Complain,0,-1.9326
+low-risk,0.0,DaySinceLastOrder,3.0,-0.9147

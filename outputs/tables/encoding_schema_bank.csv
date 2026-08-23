@@ -1,0 +1,11 @@
+Column,Role,Note
+CreditScore,numeric,
+Age,numeric,
+Tenure,numeric,
+Balance,numeric,
+NumOfProducts,numeric,
+HasCrCard,numeric,
+IsActiveMember,numeric,
+EstimatedSalary,numeric,
+Geography,nominal (one-hot),
+Gender,nominal (one-hot),

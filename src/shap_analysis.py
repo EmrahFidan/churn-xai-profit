@@ -68,6 +68,7 @@ def hazirla(set_adi, df, seed):
     on = []
     if parts["prep"] is not None:
         on.append(("hazirla", parts["prep"]))
+    on.append(("doldur", parts["impute"]))
     on.append(("ct", parts["ct"]))
     on_pipe = Pipeline(on)
     Z_full = on_pipe.fit_transform(X)

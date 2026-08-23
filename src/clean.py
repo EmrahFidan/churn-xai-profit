@@ -1,50 +1,21 @@
-"""Per-dataset cleaning (safe operations only: missing values + type fixes).
+"""Per-dataset cleaning (deterministic operations only: type fixes and coding rules).
 
-NO ENCODING. Categoricals are left raw. Each dataset is cleaned in its own lane;
-output data/processed/<set>_clean.csv. The cell2cell holdout is filled with train
-statistics (consistency + leakage prevention).
+NO ENCODING and NO STATISTICAL IMPUTATION. Categoricals are left raw and missing cells
+are kept as NaN; median / most-frequent imputation is applied inside the cross-validation
+fold by encode.MissingValueImputer. Each dataset is cleaned in its own lane; output
+data/processed/<set>_clean.csv.
 """
 import pandas as pd
-from pandas.api.types import is_numeric_dtype
 
 from . import config as cfg
 
 
-def _fit_doldurma(df: pd.DataFrame, haric=("churn",)) -> dict:
-    """Learns the fill statistic for each column that contains missing values.
-
-    Numeric -> median, categorical -> mode (if none, 'Unknown'). Returns: column ->
-    (method_name, value).
-    """
-    stats = {}
-    for c in df.columns:
-        if c in haric or not df[c].isna().any():
-            continue
-        if is_numeric_dtype(df[c]):
-            stats[c] = ("median", df[c].median())
-        else:
-            mod = df[c].mode(dropna=True)
-            stats[c] = ("mode", mod.iloc[0] if len(mod) else "Unknown")
-    return stats
-
-
-def _uygula_doldurma(df: pd.DataFrame, stats: dict):
-    """Fills missing values with the learned statistics. Returns: (df, log_rows)."""
-    df = df.copy()
-    log = []
-    for c, (yontem, deger) in stats.items():
-        if c not in df.columns:
-            continue
-        n = int(df[c].isna().sum())
-        if n:
-            df[c] = df[c].fillna(deger)
-            gosterim = f"{deger:.2f}" if isinstance(deger, float) else str(deger)
-            log.append((c, f"missing -> {yontem}", f"{n} cells filled ({gosterim})"))
-    return df, log
-
-
 def temizle_telco(df: pd.DataFrame):
-    """Telco: TotalCharges whitespace embedded in text -> numeric; tenure=0 -> 0, rest median."""
+    """Telco: TotalCharges is stored as text with blanks; convert to numeric.
+
+    Rows with tenure=0 are set to 0 (no billing cycle has closed yet). Any remaining
+    blank is left as NaN and imputed inside the fold.
+    """
     df = df.copy()
     log = []
     tc = pd.to_numeric(df["TotalCharges"], errors="coerce")
@@ -52,45 +23,37 @@ def temizle_telco(df: pd.DataFrame):
     sifir_mask = (df["tenure"] == 0) & tc.isna()
     n_sifir = int(sifir_mask.sum())
     tc[sifir_mask] = 0.0
-    med = tc.median()
-    n_med = int(tc.isna().sum())
-    tc = tc.fillna(med)
+    n_kalan = int(tc.isna().sum())
     df["TotalCharges"] = tc
-    log.append(("TotalCharges", "text -> numeric + missing fill",
-                f"{n_bos} blank; tenure=0 -> 0 ({n_sifir} rows); remaining {n_med} -> median ({med:.2f})"))
+    log.append(("TotalCharges", "text -> numeric",
+                f"{n_bos} blank; tenure=0 -> 0 ({n_sifir} rows); remaining {n_kalan} kept as NaN"))
     return df, log
 
 
 def temizle_hepsi(etiketli: dict, holdout: dict):
     """Cleans all datasets, writes them under data/processed/.
 
-    Returns: (processed: name->df, log: list of (set, column, operation, detail)).
+    Only deterministic fixes are applied here; missing cells are carried forward as NaN
+    and imputed within the fold. Returns: (processed: name->df, log: list of
+    (set, column, operation, detail)).
     """
     cfg.klasorleri_hazirla()
     processed = {}
     log = []
 
-    # Telco
+    # Telco: TotalCharges type fix
     d, lg = temizle_telco(etiketli["telco"]["df"])
     processed["telco"] = d
     log += [("telco", *r) for r in lg]
 
-    # Cell2Cell: learn statistics from TRAIN, apply to train + test
-    tr = etiketli["cell2cell"]["df"]
-    stats = _fit_doldurma(tr)
-    tr_c, lg = _uygula_doldurma(tr, stats)
-    processed["cell2cell"] = tr_c
-    log += [("cell2cell", *r) for r in lg]
-    te_c, lg = _uygula_doldurma(holdout["df"], stats)
-    processed["cell2cell_test"] = te_c
-    log += [("cell2cell_test", *r) for r in lg]
-
-    # E-commerce: numeric missing values -> median
-    d = etiketli["ecommerce"]["df"]
-    stats = _fit_doldurma(d)
-    d_c, lg = _uygula_doldurma(d, stats)
-    processed["ecommerce"] = d_c
-    log += [("ecommerce", *r) for r in lg]
+    # Cell2Cell (train + unlabeled holdout) and E-commerce: missing cells kept as NaN
+    for ad, df in (("cell2cell", etiketli["cell2cell"]["df"]),
+                   ("cell2cell_test", holdout["df"]),
+                   ("ecommerce", etiketli["ecommerce"]["df"])):
+        d = df.copy()
+        eksik = int(d.drop(columns=["churn"]).isna().sum().sum())
+        processed[ad] = d
+        log.append((ad, "-", "missing kept", f"{eksik} cells left as NaN, imputed within fold"))
 
     # Bank and Iranian: no missing values -> validate, do not touch
     for k in ("bank", "iranian"):

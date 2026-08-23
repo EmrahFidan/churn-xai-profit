@@ -1,0 +1,47 @@
+telco       (7043, 20)
+cell2cell   (51047, 57)
+ecommerce   (3941, 11)
+iranian     (3150, 14)
+bank        (10000, 11)
+===== SHAP COMPUTATION =====
+telco: SHAP computed (sample n=7043); top drivers: ['Contract', 'tenure', 'MonthlyCharges', 'OnlineSecurity', 'InternetService']
+  (4s) probability: high=0.908 low=0.011
+cell2cell: stratified sample n=15000 for SHAP explanation (full data 51047).
+cell2cell: SHAP computed (sample n=15000); top drivers: ['CurrentEquipmentDays', 'MonthlyMinutes', 'MonthsInService', 'PercChangeMinutes', 'CreditRating']
+  (37s) probability: high=0.816 low=0.048
+ecommerce: SHAP computed (sample n=3941); top drivers: ['Tenure', 'Complain', 'CashbackAmount', 'NumberOfAddress', 'MaritalStatus']
+  (11s) probability: high=1.000 low=0.000
+iranian: SHAP computed (sample n=3150); top drivers: ['Status', 'Frequency of use', 'Complains', 'Seconds of Use', 'Call  Failure']
+  (9s) probability: high=1.000 low=0.000
+bank: SHAP computed (sample n=10000); top drivers: ['Age', 'NumOfProducts', 'IsActiveMember', 'Balance', 'Geography']
+  (5s) probability: high=0.947 low=0.019
+===== iranian 'Status' SHAP =====
+iranian SHAP: 'Status' global importance rank=1/13, share=18.3% — not solely dominant, together with other usage drivers
+===== CONCEPTUAL CONSISTENCY (concept share, per set) =====
+                              Concept  telco  cell2cell  ecommerce  iranian   bank  Top-3 sector count
+       Relationship duration (tenure) 0.1062     0.0879     0.2368   0.0810 0.0104                   1
+                Contract / commitment 0.3580     0.0000     0.0000   0.0000 0.0000                   1
+                         Usage volume 0.0000     0.2208     0.0471   0.5570 0.1372                   3
+                        Usage decline 0.0000     0.0956     0.0000   0.0000 0.0000                   0
+                 Engagement / recency 0.0000     0.0000     0.2400   0.0000 0.0000                   1
+Complaint / support / service quality 0.0566     0.0930     0.1920   0.2287 0.0000                   2
+            Monetary value / spending 0.1178     0.0601     0.1187   0.0980 0.1078                   2
+                        Credit / risk 0.0000     0.0490     0.0000   0.0000 0.0155                   0
+               Payment / billing type 0.0862     0.0030     0.0000   0.0000 0.0022                   0
+         Service / subscription scope 0.2418     0.0550     0.0000   0.0000 0.2720                   2
+                   Device / equipment 0.0000     0.2125     0.0000   0.0000 0.0000                   1
+                         Demographics 0.0335     0.1093     0.0954   0.0352 0.4549                   2
+                                Other 0.0000     0.0140     0.0700   0.0000 0.0000                   0
+Saved: /Users/emrahfidan/Desktop/makale-2/outputs/tables/rq2_driver_consistency.csv
+Saved: /Users/emrahfidan/Desktop/makale-2/outputs/figures/_rq2/rq2_driver_consistency_heatmap.png
+===== SUMMARY =====
+telco       top-5: ['Contract', 'tenure', 'MonthlyCharges', 'OnlineSecurity', 'InternetService']
+cell2cell   top-5: ['CurrentEquipmentDays', 'MonthlyMinutes', 'MonthsInService', 'PercChangeMinutes', 'CreditRating']
+ecommerce   top-5: ['Tenure', 'Complain', 'CashbackAmount', 'NumberOfAddress', 'MaritalStatus']
+iranian     top-5: ['Status', 'Frequency of use', 'Complains', 'Seconds of Use', 'Call  Failure']
+bank        top-5: ['Age', 'NumOfProducts', 'IsActiveMember', 'Balance', 'Geography']
+
+CONSISTENT (top-3 in >=3 sectors): ['Usage volume']
+SECTOR-SPECIFIC (top-3 in only 1 sector): ['Relationship duration (tenure)', 'Contract / commitment', 'Engagement / recency', 'Device / equipment']
+
+STEP 4 (RQ2) complete. Interpretation left to the user. No profit/ROI (RQ3) performed.

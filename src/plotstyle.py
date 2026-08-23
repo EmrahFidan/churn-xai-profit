@@ -19,6 +19,8 @@ MODEL_RENK = {
     "rf": "#55A868",
     "xgboost": "#C44E52",
     "lightgbm": "#8172B3",
+    "catboost": "#CCB974",
+    "ebm": "#64B5CD",
 }
 # fixed line styles for calibration methods
 YONTEM_STIL = {

@@ -1,0 +1,13 @@
+Case,Churn probability,Feature,Raw value,SHAP contribution
+high-risk,0.9078,Contract = Month-to-month,Month-to-month,1.1305
+high-risk,0.9078,tenure,1,0.6299
+high-risk,0.9078,MonthlyCharges,100.8,0.3943
+high-risk,0.9078,OnlineSecurity = No,No,0.2446
+high-risk,0.9078,InternetService = Fiber optic,Fiber optic,0.2364
+high-risk,0.9078,TotalCharges,100.8,0.2358
+low-risk,0.0106,Contract = Month-to-month,Two year,-0.7479
+low-risk,0.0106,tenure,72,-0.4659
+low-risk,0.0106,Contract = Two year,Two year,-0.3576
+low-risk,0.0106,MonthlyCharges,19.9,-0.301
+low-risk,0.0106,OnlineSecurity = No,No internet service,-0.224
+low-risk,0.0106,TechSupport = No,No internet service,-0.1693

@@ -1,0 +1,13 @@
+Case,Churn probability,Feature,Raw value,SHAP contribution
+high-risk,0.8162,MonthlyMinutes,0.0,1.1751
+high-risk,0.8162,MonthsInService,11,0.433
+high-risk,0.8162,CurrentEquipmentDays,320.0,0.2735
+high-risk,0.8162,UniqueSubs,4,0.1858
+high-risk,0.8162,PeakCallsInOut,0.0,0.1423
+high-risk,0.8162,HandsetWebCapable = No,No,0.1147
+low-risk,0.0482,CurrentEquipmentDays,225.0,-0.4688
+low-risk,0.0482,MonthsInService,8,-0.4145
+low-risk,0.0482,PercChangeMinutes,-26.0,-0.1372
+low-risk,0.0482,TotalRecurringCharge,45.0,-0.1168
+low-risk,0.0482,InboundCalls,16.7,-0.1067
+low-risk,0.0482,UniqueSubs,1,-0.1027

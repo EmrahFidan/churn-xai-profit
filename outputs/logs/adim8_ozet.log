@@ -1,0 +1,38 @@
+ProfLogit method: Stripling, vanden Broucke, Antonio, Baesens, Snoeck (2018), 'Profit maximizing logistic model for customer churn prediction using genetic algorithms' (EMPC objective + genetic coefficient search).
+===== PROFLOGIT vs OURS =====
+telco / Ours (raw LightGBM + profit threshold): EMPC=0.0504 profit=110205 ROI=1.34 PR-AUC=0.664 (3s)
+telco / ProfLogit (EMPC-maximizing): EMPC=0.0492 profit=107522 ROI=1.33 PR-AUC=0.655 (3s)
+cell2cell: stratified sample n=15000 for ProfLogit (full data 51047), seed=42.
+cell2cell / Ours (raw LightGBM + profit threshold): EMPC=0.0350 profit=148255 ROI=0.70 PR-AUC=0.454 (12s)
+cell2cell / ProfLogit (EMPC-maximizing): EMPC=0.0350 profit=148085 ROI=0.70 PR-AUC=0.378 (12s)
+ecommerce / Ours (raw LightGBM + profit threshold): EMPC=0.0161 profit=53895 ROI=1.44 PR-AUC=0.908 (9s)
+ecommerce / ProfLogit (EMPC-maximizing): EMPC=0.0062 profit=20576 ROI=0.21 PR-AUC=0.678 (9s)
+iranian / Ours (raw LightGBM + profit threshold): EMPC=0.0010 profit=314 ROI=0.11 PR-AUC=0.958 (10s)
+iranian / ProfLogit (EMPC-maximizing): EMPC=-0.0101 profit=-3008 ROI=-0.69 PR-AUC=0.750 (10s)
+bank / Ours (raw LightGBM + profit threshold): EMPC=0.0324 profit=198082 ROI=0.93 PR-AUC=0.706 (6s)
+bank / ProfLogit (EMPC-maximizing): EMPC=0.0350 profit=214021 ROI=1.01 PR-AUC=0.437 (6s)
+===== COMPARISON TABLE (fold mean ± std) =====
+  Dataset                               Approach             EMPC         Profit    ROI          PR-AUC  Recall  Precision    F1  p (EMPC, Wilcoxon)  p (profit, Wilcoxon)
+    telco Ours (raw LightGBM + profit threshold)  0.0504 ± 0.0021  110205 ± 3839  1.343 0.6635 ± 0.0223   0.985      0.348 0.514              0.1250                0.1250
+    telco            ProfLogit (EMPC-maximizing)  0.0492 ± 0.0027  107522 ± 5178  1.332 0.6554 ± 0.0271   0.981      0.353 0.519              0.1250                0.1250
+cell2cell Ours (raw LightGBM + profit threshold)  0.0350 ± 0.0010  148255 ± 5605  0.701 0.4542 ± 0.0101   1.000      0.289 0.448              0.6250                0.5000
+cell2cell            ProfLogit (EMPC-maximizing)  0.0350 ± 0.0010  148085 ± 5741  0.700 0.3783 ± 0.0128   1.000      0.288 0.448              0.6250                0.5000
+ecommerce Ours (raw LightGBM + profit threshold)  0.0161 ± 0.0054  53895 ± 18355  1.443 0.9084 ± 0.0162   0.912      0.704 0.795              0.0625                0.0625
+ecommerce            ProfLogit (EMPC-maximizing)  0.0062 ± 0.0043  20576 ± 14766  0.213 0.6783 ± 0.0248   0.953      0.284 0.436              0.0625                0.0625
+  iranian Ours (raw LightGBM + profit threshold)  0.0010 ± 0.0015      314 ± 443  0.109 0.9576 ± 0.0115   0.968      0.796 0.873              0.0625                0.0625
+  iranian            ProfLogit (EMPC-maximizing) -0.0101 ± 0.0018    -3008 ± 503 -0.687 0.7500 ± 0.0157   0.927      0.501 0.643              0.0625                0.0625
+     bank Ours (raw LightGBM + profit threshold)  0.0324 ± 0.0026 198082 ± 14292  0.927 0.7065 ± 0.0150   0.964      0.281 0.435              0.0625                0.0625
+     bank            ProfLogit (EMPC-maximizing)  0.0350 ± 0.0021 214021 ± 11574  1.005 0.4369 ± 0.0301   0.898      0.262 0.406              0.0625                0.0625
+Paired Wilcoxon (dataset×fold, n=25): EMPC p=0.0152, profit p=0.1194.
+Saved: /Users/emrahfidan/Desktop/makale-2/outputs/tables/profit_baseline_comparison.csv
+Saved: /Users/emrahfidan/Desktop/makale-2/outputs/figures/_baseline/proflogit_vs_ours_empc.png
+Saved: /Users/emrahfidan/Desktop/makale-2/outputs/figures/_baseline/proflogit_vs_ours_profit.png
+===== SUMMARY =====
+  telco       EMPC diff(ours−PL)=+0.0012 profit diff=+2683 -> ours ahead
+  cell2cell   EMPC diff(ours−PL)=+0.0000 profit diff=+169 -> ours ahead
+  ecommerce   EMPC diff(ours−PL)=+0.0099 profit diff=+33319 -> ours ahead
+  iranian     EMPC diff(ours−PL)=+0.0111 profit diff=+3322 -> ours ahead
+  bank        EMPC diff(ours−PL)=-0.0026 profit diff=-15939 -> ProfLogit ahead
+
+Pooled: EMPC p=0.0152, profit p=0.1194 (significant / noise)
+STEP 8 complete. Profit-driven baseline compared; interpretation left to the user.

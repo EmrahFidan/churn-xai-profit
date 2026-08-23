@@ -31,7 +31,7 @@ from . import strings as S
 SEEDS = cfg.CFG["seeds"]
 C_ORAN = cfg.CFG["profit"]["emp_c_oran"]   # reference cost ratio (5%)
 GAMMA = 0.30
-ABLATION_SETLERI = ["telco", "cell2cell"]
+ABLATION_SETLERI = list(cfg.DATASETS)
 _OOF = {}  # (set, model, seed) -> (p, y)
 
 

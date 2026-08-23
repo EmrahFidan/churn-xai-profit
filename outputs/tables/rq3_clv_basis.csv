@@ -1,0 +1,6 @@
+Dataset,CLV basis,Mean CLV,Median CLV,Zero-CLV count
+telco,MonthlyCharges × 24 mo,1554.28,1688.4,0
+cell2cell,MonthlyRevenue × 24 mo,1411.27,1163.04,9
+ecommerce,CashbackAmount (monthly value proxy) × 24 mo,4240.98,3920.16,3
+iranian,Customer Value (direct),470.97,228.48,132
+bank,Balance × 0.02 annual margin × 2.0 yr,3059.44,3887.94,3617

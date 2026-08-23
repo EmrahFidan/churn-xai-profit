@@ -1,0 +1,11 @@
+Column,Role,Note
+Tenure,numeric,
+WarehouseToHome,numeric,
+NumberOfDeviceRegistered,numeric,
+SatisfactionScore,numeric,
+NumberOfAddress,numeric,
+Complain,numeric,
+DaySinceLastOrder,numeric,
+CashbackAmount,numeric,
+PreferedOrderCat,nominal (one-hot),
+MaritalStatus,nominal (one-hot),

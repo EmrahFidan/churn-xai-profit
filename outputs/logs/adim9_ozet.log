@@ -1,0 +1,16 @@
+===== SIGNATURE EVIDENCE =====
+  Dataset  PR-AUC    EMP  Churner CLV median  Churner CLV Gini  Churner CLV CV  Churn rate
+    telco  0.6635 0.0491              1911.6             0.184           0.331       0.265
+cell2cell  0.4663 0.0352              1146.7             0.345           0.766       0.288
+ecommerce  0.9084 0.0161              3584.2             0.123           0.237       0.171
+  iranian  0.9576 0.0007                96.8             0.502           1.036       0.157
+     bank  0.7065 0.0319              4374.0             0.350           0.640       0.204
+Saved: /Users/emrahfidan/Desktop/makale-2/outputs/tables/signature_evidence.csv
+PR-AUC↔EMP: Spearman ρ=-0.900 (p=0.037), Pearson r=-0.788 (p=0.114). n=5 small → trend/illustration, no strong claim.
+Saved: /Users/emrahfidan/Desktop/makale-2/outputs/figures/_signature/prauc_vs_emp_scatter.png
+Saved: /Users/emrahfidan/Desktop/makale-2/outputs/figures/_signature/churner_value_distributions.png
+===== RANKING COMPARISON =====
+PR-AUC ranking: iranian > ecommerce > bank > telco > cell2cell  |  EMP ranking: telco > cell2cell > bank > ecommerce > iranian  -> rankings are INVERSE/unrelated -> predictability does not guarantee profitability
+
+Example: iranian PR-AUC=0.96 (highest) but EMP=0.0007 (lowest); telco PR-AUC=0.66 (lowest) but EMP=0.0491 (highest).
+STEP 9 complete. Signature finding (predictability ≠ profitability) documented.

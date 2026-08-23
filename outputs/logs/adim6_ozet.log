@@ -1,0 +1,74 @@
+
+
+# ==== SEMANTIC ADDENDUM ====
+telco       (7043, 20)
+cell2cell   (51047, 57)
+ecommerce   (3941, 11)
+iranian     (3150, 14)
+bank        (10000, 11)
+===== TRANSFER PROBE (importance-based) =====
+Cell2Cell -> Iranian (intra-sector): shared concepts=5 | transfer PR-AUC=0.153 | ref=0.845 | trivial=0.157 | ratio=0.18 -> WEAK
+Iranian -> Cell2Cell (intra-sector): shared concepts=5 | transfer PR-AUC=0.278 | ref=0.404 | trivial=0.288 | ratio=0.69 -> WEAK
+telco -> bank (cross-sector): shared concepts=3 | transfer PR-AUC=0.237 | ref=0.450 | trivial=0.204 | ratio=0.53 -> PARTIAL
+bank -> telco (cross-sector): shared concepts=3 | transfer PR-AUC=0.207 | ref=0.622 | trivial=0.265 | ratio=0.33 -> WEAK
+===== TRANSFER PROBE (semantic mapping) =====
+Cell2Cell -> Iranian [semantic]: concepts=5 | transfer PR-AUC=0.281 | ref=0.870 | trivial=0.157 | ratio=0.32 -> PARTIAL
+Iranian -> Cell2Cell [semantic]: concepts=5 | transfer PR-AUC=0.270 | ref=0.394 | trivial=0.288 | ratio=0.68 -> WEAK
+===== TRANSFER RESULTS (importance + semantic) =====
+Scenario            Direction     Mapping type  Shared concept count  Transfer PR-AUC  In-domain ref PR-AUC  Full-feature ref PR-AUC  Trivial PR-AUC  Retention ratio  Recall  Precision     F1 Decision
+      A1 Cell2Cell -> Iranian importance-based                     5           0.1531                0.8449                   0.9576          0.1571            0.181  0.4242     0.1308 0.2000     WEAK
+      A2 Iranian -> Cell2Cell importance-based                     5           0.2783                0.4035                   0.4661          0.2882            0.690  0.8214     0.2829 0.4209     WEAK
+      B1        telco -> bank importance-based                     3           0.2373                0.4503                   0.7065          0.2037            0.527  0.7545     0.2408 0.3651  PARTIAL
+      B2        bank -> telco importance-based                     3           0.2075                0.6219                   0.6635          0.2654            0.334  0.0000     0.0000 0.0000     WEAK
+      A1 Cell2Cell -> Iranian         semantic                     5           0.2807                0.8703                   0.9576          0.1571            0.323  0.1616     0.5128 0.2458  PARTIAL
+      A2 Iranian -> Cell2Cell         semantic                     5           0.2697                0.3944                   0.4661          0.2882            0.684  0.6399     0.2725 0.3822     WEAK
+Saved: /Users/emrahfidan/Desktop/churn-xai-profit/outputs/tables/transfer_results.csv
+Saved: /Users/emrahfidan/Desktop/churn-xai-profit/outputs/tables/transfer_feature_map_semantic.csv
+===== FIGURES =====
+Saved: /Users/emrahfidan/Desktop/churn-xai-profit/outputs/figures/_transfer/transfer_prauc_comparison.png
+Saved: /Users/emrahfidan/Desktop/churn-xai-profit/outputs/figures/_transfer/transfer_retention_ratio.png
+Saved: /Users/emrahfidan/Desktop/churn-xai-profit/outputs/figures/_transfer/transfer_semantic_vs_importance.png
+===== SUMMARY — semantic vs importance-based =====
+  A1 Cell2Cell -> Iranian  : importance ratio=0.18 (WEAK) -> semantic ratio=0.32 (PARTIAL)  [transfer PR-AUC 0.153 -> 0.281]
+  A2 Iranian -> Cell2Cell  : importance ratio=0.69 (WEAK) -> semantic ratio=0.68 (WEAK)  [transfer PR-AUC 0.278 -> 0.270]
+
+RESULT: Even WITH semantic mapping, no scenario reaches the threshold (no INCLUDED). The finding is reinforced: weak transfer is not a matching artifact — the drivers genuinely do not carry across sets/sectors (this strengthens RQ2).
+
+STEP 6 (transfer) complete. Interpretation left to the user. No robustness/write-up (Step 7) performed.
+
+
+# ==== SEMANTIC ADDENDUM ====
+telco       (7043, 20)
+cell2cell   (51047, 57)
+ecommerce   (3941, 11)
+iranian     (3150, 14)
+bank        (10000, 11)
+===== TRANSFER PROBE (importance-based) =====
+Cell2Cell -> Iranian (intra-sector): shared concepts=5 | transfer PR-AUC=0.106 | ref=0.845 | trivial=0.157 | ratio=0.13 -> WEAK
+Iranian -> Cell2Cell (intra-sector): shared concepts=5 | transfer PR-AUC=0.278 | ref=0.404 | trivial=0.288 | ratio=0.69 -> WEAK
+telco -> bank (cross-sector): shared concepts=3 | transfer PR-AUC=0.237 | ref=0.450 | trivial=0.204 | ratio=0.53 -> PARTIAL
+bank -> telco (cross-sector): shared concepts=3 | transfer PR-AUC=0.207 | ref=0.622 | trivial=0.265 | ratio=0.33 -> WEAK
+===== TRANSFER PROBE (semantic mapping) =====
+Cell2Cell -> Iranian [semantic]: concepts=5 | transfer PR-AUC=0.272 | ref=0.870 | trivial=0.157 | ratio=0.31 -> PARTIAL
+Iranian -> Cell2Cell [semantic]: concepts=5 | transfer PR-AUC=0.270 | ref=0.395 | trivial=0.288 | ratio=0.68 -> WEAK
+===== TRANSFER RESULTS (importance + semantic) =====
+Scenario            Direction     Mapping type  Shared concept count  Transfer PR-AUC  In-domain ref PR-AUC  Full-feature ref PR-AUC  Trivial PR-AUC  Retention ratio  Recall  Precision     F1 Decision
+      A1 Cell2Cell -> Iranian importance-based                     5           0.1060                0.8449                   0.9576          0.1571            0.125  0.3939     0.0880 0.1438     WEAK
+      A2 Iranian -> Cell2Cell importance-based                     5           0.2777                0.4045                   0.4663          0.2882            0.687  0.8210     0.2827 0.4206     WEAK
+      B1        telco -> bank importance-based                     3           0.2373                0.4503                   0.7065          0.2037            0.527  0.7545     0.2408 0.3651  PARTIAL
+      B2        bank -> telco importance-based                     3           0.2075                0.6219                   0.6635          0.2654            0.334  0.0000     0.0000 0.0000     WEAK
+      A1 Cell2Cell -> Iranian         semantic                     5           0.2721                0.8703                   0.9576          0.1571            0.313  0.1657     0.5062 0.2496  PARTIAL
+      A2 Iranian -> Cell2Cell         semantic                     5           0.2695                0.3951                   0.4663          0.2882            0.682  0.6379     0.2722 0.3815     WEAK
+Saved: /Users/emrahfidan/Desktop/makale-2/outputs/tables/transfer_results.csv
+Saved: /Users/emrahfidan/Desktop/makale-2/outputs/tables/transfer_feature_map_semantic.csv
+===== FIGURES =====
+Saved: /Users/emrahfidan/Desktop/makale-2/outputs/figures/_transfer/transfer_prauc_comparison.png
+Saved: /Users/emrahfidan/Desktop/makale-2/outputs/figures/_transfer/transfer_retention_ratio.png
+Saved: /Users/emrahfidan/Desktop/makale-2/outputs/figures/_transfer/transfer_semantic_vs_importance.png
+===== SUMMARY — semantic vs importance-based =====
+  A1 Cell2Cell -> Iranian  : importance ratio=0.13 (WEAK) -> semantic ratio=0.31 (PARTIAL)  [transfer PR-AUC 0.106 -> 0.272]
+  A2 Iranian -> Cell2Cell  : importance ratio=0.69 (WEAK) -> semantic ratio=0.68 (WEAK)  [transfer PR-AUC 0.278 -> 0.270]
+
+RESULT: Even WITH semantic mapping, no scenario reaches the threshold (no INCLUDED). The finding is reinforced: weak transfer is not a matching artifact — the drivers genuinely do not carry across sets/sectors (this strengthens RQ2).
+
+STEP 6 (transfer) complete. Interpretation left to the user. No robustness/write-up (Step 7) performed.

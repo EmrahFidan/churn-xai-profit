@@ -1,0 +1,11 @@
+Feature,Mean |SHAP|,Rank,Concept
+Tenure,4.108184,1,Relationship duration (tenure)
+Complain,2.258647,2,Complaint / support / service quality
+CashbackAmount,2.058248,3,Monetary value / spending
+NumberOfAddress,1.695853,4,Engagement / recency
+MaritalStatus,1.65509,5,Demographics
+WarehouseToHome,1.32518,6,Engagement / recency
+PreferedOrderCat,1.213442,7,Other
+DaySinceLastOrder,1.141478,8,Engagement / recency
+SatisfactionScore,1.072051,9,Complaint / support / service quality
+NumberOfDeviceRegistered,0.817451,10,Usage volume
