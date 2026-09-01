@@ -97,22 +97,41 @@ def figur_scatter(prauc, emp):
     return yol
 
 
+# Journal layouts carry the description in the caption, so the in-figure title is
+# switched off to remove the band above the panels.
+BASLIK_GOSTER = False
+
+
 def figur_dagilim(churner_clv):
+    # Two rows keep the panels close to a printed page ratio and leave room for the
+    # annotations, which were cramped when all five sat in a single row.
     setler = list(cfg.DATASETS)
-    fig, axes = plt.subplots(1, len(setler), figsize=(3.2 * len(setler), 3.4), squeeze=False)
-    for ax, s in zip(axes[0], setler):
+    sutun = 3
+    satir = int(np.ceil(len(setler) / sutun))
+    fig, axes = plt.subplots(satir, sutun, figsize=(4.3 * sutun, 3.7 * satir))
+    eksenler = np.atleast_1d(axes).ravel()
+
+    for ax, s in zip(eksenler, setler):
         cc = churner_clv[s]
         ax.hist(cc, bins=30, color=ps.CHURN_RENK[1], alpha=0.85)
-        ax.axvline(np.median(cc), color=ps.CHURN_RENK[0], linestyle="--",
-                   label=f"median={np.median(cc):.0f}")
-        ax.set_title(f"{s}\nGini={gini(cc):.2f}", fontsize=10)
-        ax.set_xlabel(S.EKSEN9["clv"])
-        ax.set_ylabel(S.EKSEN9["sayi"])
-        ax.legend(fontsize=8)
-    fig.suptitle(S.FIG9_BASLIK["dagilim"])
-    fig.tight_layout(rect=(0, 0, 1, 0.93))
+        ax.axvline(np.median(cc), color=ps.CHURN_RENK[0], linestyle="--", linewidth=1.6,
+                   label="median = " + format(np.median(cc), '.0f'))
+        ax.set_title(s + "   Gini = " + format(gini(cc), '.2f'), fontsize=13, pad=2)
+        ax.set_xlabel(S.EKSEN9["clv"], fontsize=12)
+        ax.set_ylabel(S.EKSEN9["sayi"], fontsize=12)
+        ax.tick_params(axis="both", labelsize=11)
+        ax.legend(fontsize=11, frameon=False)
+
+    for ax in eksenler[len(setler):]:
+        ax.axis("off")
+
+    if BASLIK_GOSTER:
+        fig.suptitle(S.FIG9_BASLIK["dagilim"], fontsize=14, y=1.0, va='top')
+        fig.tight_layout(rect=(0, 0, 1, 0.988))
+    else:
+        fig.tight_layout()
     d = cfg.FIGURES / "_signature"
     d.mkdir(parents=True, exist_ok=True)
     yol = d / S.FIG9_DOSYA["dagilim"]
-    fig.savefig(yol)
+    fig.savefig(yol, dpi=300, bbox_inches="tight")
     return yol

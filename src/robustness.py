@@ -211,35 +211,81 @@ def anlamlilik(veriler):
 
 # ----------------------------- figures -----------------------------
 def _kaydet(fig, dosya):
+    # Saved at 300 dpi so the panels stay legible in the manuscript layout.
     d = cfg.FIGURES / "_robust"
     d.mkdir(parents=True, exist_ok=True)
     yol = d / dosya
-    fig.savefig(yol)
+    fig.savefig(yol, dpi=300, bbox_inches="tight")
     return yol
 
 
+# Journal layouts usually carry the description in the caption, so the in-figure
+# title can be switched off to remove the band above the panels.
+BASLIK_GOSTER = False
+
+
+def _olcek(degerler):
+    # Chooses a display scale so that the axis carries readable numbers.
+    buyuk = max(abs(min(degerler)), abs(max(degerler)), 1.0)
+    if buyuk >= 1e6:
+        return 1e6, ' (millions)'
+    if buyuk >= 1e3:
+        return 1e3, ' (thousands)'
+    return 1.0, ''
+
+
 def figur_ablation(tum_ablation):
+    # Two rows of panels keep the figure close to a printed page ratio; the last cell
+    # carries the condition key so that the bars can stay labelled with short codes.
     setler = list(tum_ablation.keys())
     kosullar = list(S.KOSUL_ABLATION.keys())
-    fig, axes = plt.subplots(1, len(setler), figsize=(6.5 * len(setler), 5), squeeze=False)
-    for ax, s in zip(axes[0], setler):
+    sutun = 3
+    satir = int(np.ceil((len(setler) + 1) / sutun))
+    fig, axes = plt.subplots(satir, sutun, figsize=(4.4 * sutun, 3.8 * satir))
+    eksenler = np.atleast_1d(axes).ravel()
+
+    for ax, s in zip(eksenler, setler):
         d = tum_ablation[s]
-        kar = [d[k]["kar"] for k in kosullar]
-        err = [[d[k]["kar"] - d[k]["kar_lo"] for k in kosullar],
-               [d[k]["kar_hi"] - d[k]["kar"] for k in kosullar]]
+        kar = [d[k]['kar'] for k in kosullar]
+        bol, birim = _olcek(kar)
+        kar_o = [v / bol for v in kar]
+        err = [[(d[k]['kar'] - d[k]['kar_lo']) / bol for k in kosullar],
+               [(d[k]['kar_hi'] - d[k]['kar']) / bol for k in kosullar]]
         renk = [ps.CHURN_RENK[0]] + [ps.CHURN_RENK[1]] * (len(kosullar) - 1)
-        ax.bar(kosullar, kar, yerr=err, capsize=4, color=renk)
-        ax.axhline(d["K0"]["kar"], color="#444444", linestyle="--", linewidth=1)
+
+        ax.bar(kosullar, kar_o, yerr=err, capsize=4, color=renk, width=0.65)
+        ax.axhline(kar_o[0], color='#444444', linestyle='--', linewidth=1.0, zorder=0)
+        ax.axhline(0, color='black', linewidth=0.8, zorder=1)
+
+        aralik = max(kar_o) - min(kar_o) or 1.0
         for i, k in enumerate(kosullar):
-            if k != "K0":
-                ax.text(i, kar[i], f"{d[k]['dkar_yuzde']:+.0f}%", ha="center",
-                        va="bottom" if kar[i] >= 0 else "top", fontsize=9)
-        ax.set_title(s)
-        ax.set_ylabel(S.EKSEN7["kar"])
-        ax.axhline(0, color="black", linewidth=0.8)
-    fig.suptitle(S.FIG7_BASLIK["ablation"])
-    fig.tight_layout(rect=(0, 0, 1, 0.93))
-    return _kaydet(fig, S.FIG7_DOSYA["ablation"])
+            if k == 'K0':
+                continue
+            ust = kar_o[i] + (err[1][i] if kar_o[i] >= 0 else -err[0][i])
+            kayma = 0.04 * aralik * (1 if kar_o[i] >= 0 else -1)
+            ax.text(i, ust + kayma, format(d[k]['dkar_yuzde'], '+.0f') + '%',
+                    ha='center', va='bottom' if kar_o[i] >= 0 else 'top', fontsize=10.5)
+
+        ax.set_title(s, fontsize=13, pad=2)
+        ax.set_ylabel(S.EKSEN7['kar'] + birim, fontsize=12)
+        ax.tick_params(axis='both', labelsize=11)
+        ax.margins(y=0.22)
+
+    # condition key in the free cell
+    anahtar = eksenler[len(setler)]
+    anahtar.axis('off')
+    satirlar = [k + '  ' + S.KOSUL_ABLATION[k].split(' ', 1)[1] for k in kosullar]
+    anahtar.text(0.0, 0.94, 'Conditions', fontsize=12, fontweight='bold', va='top')
+    anahtar.text(0.0, 0.80, chr(10).join(satirlar), fontsize=11, va='top', linespacing=1.9)
+    for ax in eksenler[len(setler) + 1:]:
+        ax.axis('off')
+
+    if BASLIK_GOSTER:
+        fig.suptitle(S.FIG7_BASLIK['ablation'], fontsize=14, y=1.0, va='top')
+        fig.tight_layout(rect=(0, 0, 1, 0.988))
+    else:
+        fig.tight_layout()
+    return _kaydet(fig, S.FIG7_DOSYA['ablation'])
 
 
 def figur_ci(tum_ci):
